@@ -37,6 +37,7 @@ build/
 mongod.log
 __pycache__/
 *.pyc
+*.py
 ~$*.docx
 frontend/node_modules/
 frontend/dist/
