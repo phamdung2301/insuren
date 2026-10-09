@@ -36,11 +36,11 @@ export const OtpModal = ({ email, isOpen, onClose, onVerify }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!otp || otp.length < 6) {
-      setError('Vui lòng nhập đầy đủ mã OTP 6 chữ số');
+      setError('Bạn nhập đủ 6 số của mã OTP nhé');
       return;
     }
     if (timeLeft === 0) {
-      setError('Mã OTP đã hết hạn. Vui lòng yêu cầu mã mới');
+      setError('Mã OTP đã hết hạn, bạn bấm gửi lại mã mới nhé');
       return;
     }
 
@@ -58,9 +58,9 @@ export const OtpModal = ({ email, isOpen, onClose, onVerify }) => {
           <div className="user-avatar" style={{ margin: '0 auto 1rem', width: 56, height: 56, backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}>
             <Mail size={28} />
           </div>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)' }}>Xác thực Gmail OTP</h3>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)' }}>Xác thực OTP</h3>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Mã OTP 6 số đã được gửi đến địa chỉ <strong>{email}</strong>
+            Mã gồm 6 số đã được gửi đến <strong>{email}</strong>
           </p>
         </div>
 
@@ -94,10 +94,10 @@ export const OtpModal = ({ email, isOpen, onClose, onVerify }) => {
 
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
             <button type="button" onClick={onClose} className="btn btn-outline" style={{ flex: 1 }}>
-              Hủy bỏ
+              Hủy
             </button>
             <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={loading}>
-              {loading ? 'Đang xác thực...' : 'Xác thực & Đăng nhập'}
+              {loading ? 'Đang xác thực...' : 'Xác nhận'}
             </button>
           </div>
         </form>

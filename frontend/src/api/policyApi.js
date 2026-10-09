@@ -26,6 +26,10 @@ export const policyApi = {
   getPolicyHistory: (policyNumber) => axiosClient.get(`/policies/${policyNumber}/history`),
   getPolicyVersions: (policyNumber) => axiosClient.get(`/policies/${policyNumber}/versions`),
   getPolicyVersion: (policyNumber, version) => axiosClient.get(`/policies/${policyNumber}/versions/${version}`),
+
+  // Renewal (tái tục)
+  renewPolicy: (policyNumber) => axiosClient.post(`/policies/${policyNumber}/renew`),
+  getExpiringPolicies: (days = 30) => axiosClient.get('/policies/expiring', { params: { days } }),
 };
 
 export const excelApi = {

@@ -1,0 +1,2941 @@
+diff --git a/frontend/src/api/axiosClient.js b/frontend/src/api/axiosClient.js
+index 5b8a3a5..19e2f7c 100644
+--- a/frontend/src/api/axiosClient.js
++++ b/frontend/src/api/axiosClient.js
+@@ -35,7 +35,7 @@ axiosClient.interceptors.response.use(
+         message = message ? `${message} (${details})` : details;
+       }
+     }
+-    return Promise.reject(new Error(message || error.message || 'Có lỗi kết nối hệ thống server'));
++    return Promise.reject(new Error(message || error.message || 'Không kết nối được máy chủ, bạn kiểm tra mạng và thử lại nhé'));
+   }
+ );
+ 
+diff --git a/frontend/src/components/Navbar.jsx b/frontend/src/components/Navbar.jsx
+index dcb5925..06e531d 100644
+--- a/frontend/src/components/Navbar.jsx
++++ b/frontend/src/components/Navbar.jsx
+@@ -25,13 +25,13 @@ export const Navbar = ({ user, onLogout, isAdmin }) => {
+               <li>
+                 <Link to="/my-policies" className={`nav-item ${isActive('/my-policies')}`}>
+                   <FileText size={18} />
+-                  <span>{isAdmin ? 'Quản Lý Đơn BH' : 'Hợp đồng của tôi'}</span>
++                  <span>{isAdmin ? 'Quản lý hợp đồng' : 'Hợp đồng của tôi'}</span>
+                 </Link>
+               </li>
+               <li>
+                 <Link to="/buy" className={`nav-item ${isActive('/buy')}`}>
+                   <ShoppingBag size={18} />
+-                  <span>Mua Bảo Hiểm</span>
++                  <span>Mua bảo hiểm</span>
+                 </Link>
+               </li>
+             </>
+@@ -46,7 +46,7 @@ export const Navbar = ({ user, onLogout, isAdmin }) => {
+                 style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+               >
+                 <Settings size={18} />
+-                <span>Quản Trị</span>
++                <span>Quản trị</span>
+                 <ChevronDown size={14} style={{ transform: adminMenuOpen ? 'rotate(180deg)' : 'rotate(0)', transition: '0.2s' }} />
+               </button>
+ 
+@@ -72,7 +72,7 @@ export const Navbar = ({ user, onLogout, isAdmin }) => {
+                       onClick={() => setAdminMenuOpen(false)}
+                     >
+                       <BarChart2 size={16} />
+-                      <span>Báo Cáo Thống Kê</span>
++                      <span>Báo cáo</span>
+                     </Link>
+                   </li>
+                   <li>
+@@ -83,7 +83,7 @@ export const Navbar = ({ user, onLogout, isAdmin }) => {
+                       onClick={() => setAdminMenuOpen(false)}
+                     >
+                       <Cpu size={16} />
+-                      <span>Benchmark 50k</span>
++                      <span>Kiểm tra hiệu năng</span>
+                     </Link>
+                   </li>
+                 </ul>
+@@ -140,7 +140,7 @@ export const Navbar = ({ user, onLogout, isAdmin }) => {
+           ) : (
+             <Link to="/login" className="btn btn-primary">
+               <User size={18} />
+-              <span>Đăng Nhập</span>
++              <span>Đăng nhập</span>
+             </Link>
+           )}
+         </div>
+diff --git a/frontend/src/components/OtpModal.jsx b/frontend/src/components/OtpModal.jsx
+index f97af0a..d6f554e 100644
+--- a/frontend/src/components/OtpModal.jsx
++++ b/frontend/src/components/OtpModal.jsx
+@@ -36,11 +36,11 @@ export const OtpModal = ({ email, isOpen, onClose, onVerify }) => {
+   const handleSubmit = (e) => {
+     e.preventDefault();
+     if (!otp || otp.length < 6) {
+-      setError('Vui lòng nhập đầy đủ mã OTP 6 chữ số');
++      setError('Bạn nhập đủ 6 số của mã OTP nhé');
+       return;
+     }
+     if (timeLeft === 0) {
+-      setError('Mã OTP đã hết hạn. Vui lòng yêu cầu mã mới');
++      setError('Mã OTP đã hết hạn, bạn bấm gửi lại mã mới nhé');
+       return;
+     }
+ 
+@@ -58,9 +58,9 @@ export const OtpModal = ({ email, isOpen, onClose, onVerify }) => {
+           <div className="user-avatar" style={{ margin: '0 auto 1rem', width: 56, height: 56, backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}>
+             <Mail size={28} />
+           </div>
+-          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)' }}>Xác thực Gmail OTP</h3>
++          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)' }}>Xác thực OTP</h3>
+           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+-            Mã OTP 6 số đã được gửi đến địa chỉ <strong>{email}</strong>
++            Mã gồm 6 số đã được gửi đến <strong>{email}</strong>
+           </p>
+         </div>
+ 
+@@ -94,10 +94,10 @@ export const OtpModal = ({ email, isOpen, onClose, onVerify }) => {
+ 
+           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+             <button type="button" onClick={onClose} className="btn btn-outline" style={{ flex: 1 }}>
+-              Hủy bỏ
++              Hủy
+             </button>
+             <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={loading}>
+-              {loading ? 'Đang xác thực...' : 'Xác thực & Đăng nhập'}
++              {loading ? 'Đang xác thực...' : 'Xác nhận'}
+             </button>
+           </div>
+         </form>
+diff --git a/frontend/src/components/StatusBadge.jsx b/frontend/src/components/StatusBadge.jsx
+index a3bf032..70faea5 100644
+--- a/frontend/src/components/StatusBadge.jsx
++++ b/frontend/src/components/StatusBadge.jsx
+@@ -3,18 +3,18 @@ import React from 'react';
+ export const StatusBadge = ({ status }) => {
+   const getStatusLabel = (st) => {
+     switch (st) {
+-      case 'DRAFT': return 'DRAFT - Bản nháp';
+-      case 'QUOTED': return 'QUOTED - Báo phí';
+-      case 'BOUND': return 'BOUND - Gắn kết';
+-      case 'ACTIVE': return 'ACTIVE - Hiệu lực';
+-      case 'CANCELLED': return 'CANCELLED - Đã hủy';
+-      case 'EXPIRED': return 'EXPIRED - Hết hạn';
++      case 'DRAFT': return 'Bản nháp';
++      case 'QUOTED': return 'Đã báo giá';
++      case 'BOUND': return 'Đã ký kết';
++      case 'ACTIVE': return 'Đang hiệu lực';
++      case 'CANCELLED': return 'Đã hủy';
++      case 'EXPIRED': return 'Đã hết hạn';
+       default: return st || 'N/A';
+     }
+   };
+ 
+   return (
+-    <span className={`status-badge status-${status || 'DRAFT'}`}>
++    <span className={`status-badge status-${status || 'DRAFT'}${status === 'ACTIVE' ? ' v2-pulse' : ''}`}>
+       <span className="dot" style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'currentColor' }} />
+       {getStatusLabel(status)}
+     </span>
+diff --git a/frontend/src/index.css b/frontend/src/index.css
+index ae01d53..50ca987 100644
+--- a/frontend/src/index.css
++++ b/frontend/src/index.css
+@@ -374,3 +374,95 @@ input, select, textarea {
+   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+   .navbar-inner { flex-direction: column; gap: 1rem; }
+ }
++
++/* ══════════════════════════════════════════════════════════════════
++   INSUREN UI v2 — modern motion layer (append-only, 2026-10-09)
++   Không sửa style cũ bên trên. Tôn trọng prefers-reduced-motion.
++   ══════════════════════════════════════════════════════════════════ */
++
++/* ---------- keyframes ---------- */
++@keyframes v2-fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
++@keyframes v2-floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
++@keyframes v2-blobMove { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -24px) scale(1.08); } 66% { transform: translate(-24px, 18px) scale(0.94); } }
++@keyframes v2-pulseRing { 0% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.45); } 70% { box-shadow: 0 0 0 12px rgba(13, 148, 136, 0); } 100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); } }
++@keyframes v2-shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
++@keyframes v2-gradShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
++@keyframes v2-marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
++@keyframes v2-barGrow { from { width: 0; } }
++@keyframes v2-spinSlow { to { transform: rotate(360deg); } }
++@keyframes spin { to { transform: rotate(360deg); } }
++
++/* ---------- entrance ---------- */
++.v2-anim { animation: v2-fadeUp 0.55s cubic-bezier(0.22, 0.8, 0.32, 1) both; }
++.v2-d1 { animation-delay: 0.05s; } .v2-d2 { animation-delay: 0.14s; } .v2-d3 { animation-delay: 0.23s; }
++.v2-d4 { animation-delay: 0.32s; } .v2-d5 { animation-delay: 0.41s; } .v2-d6 { animation-delay: 0.5s; }
++
++/* ---------- decorative ---------- */
++.v2-blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.5; animation: v2-blobMove 12s ease-in-out infinite; pointer-events: none; }
++.v2-grad-text { background: linear-gradient(90deg, #1e3a8a, #6366f1, #0d9488, #1e3a8a); background-size: 300% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: v2-gradShift 6s ease infinite; }
++.v2-float { animation: v2-floaty 5s ease-in-out infinite; }
++.v2-glass { background: rgba(255, 255, 255, 0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.6); }
++
++/* ---------- hero banner ---------- */
++.v2-hero { position: relative; overflow: hidden; border-radius: var(--radius-lg); padding: 1.75rem 2rem; color: #fff;
++  background: linear-gradient(120deg, #1e3a8a, #3730a3 55%, #0d9488 135%); box-shadow: var(--shadow-md); }
++.v2-hero h1, .v2-hero h2 { color: #fff; }
++.v2-hero p { color: #dbeafe; }
++
++/* ---------- KPI card ---------- */
++.v2-kpi { position: relative; overflow: hidden; background: var(--bg-surface); border: 1px solid var(--border);
++  border-radius: var(--radius-lg); padding: 1.15rem 1.3rem; box-shadow: var(--shadow-sm); transition: transform 0.2s ease, box-shadow 0.2s ease; }
++.v2-kpi:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
++.v2-kpi::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
++  background: linear-gradient(90deg, var(--kpi-c1, var(--primary)), var(--kpi-c2, var(--accent))); }
++.v2-kpi .v2-kpi-label { font-size: 0.72rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
++.v2-kpi .v2-kpi-value { font-size: 1.6rem; font-weight: 800; margin-top: 0.25rem; font-variant-numeric: tabular-nums; }
++.v2-kpi .v2-kpi-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem; }
++
++/* ---------- animated bars ---------- */
++.v2-bar-track { flex: 1; height: 10px; background: #eef2f7; border-radius: 99px; overflow: hidden; min-width: 60px; }
++.v2-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
++  background-size: 200% 100%; animation: v2-barGrow 1s cubic-bezier(0.22, 0.8, 0.32, 1) both, v2-gradShift 4s linear 1s infinite; }
++
++/* ---------- card lift ---------- */
++.v2-card-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
++.v2-card-lift:hover { transform: translateY(-4px); box-shadow: 0 14px 34px rgba(30, 58, 138, 0.14); }
++
++/* ---------- ACTIVE badge pulse (additive, old classes untouched) ---------- */
++.status-ACTIVE.v2-pulse { animation: v2-pulseRing 2.4s infinite; }
++
++/* ---------- stepper v2 ---------- */
++.v2-step-line { flex: 1; height: 4px; border-radius: 3px; margin: 18px 0.7rem 0; min-width: 30px; background: var(--border); position: relative; overflow: hidden; align-self: flex-start; }
++.v2-step-line.done { background: var(--secondary); }
++.v2-step-line.done::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent);
++  background-size: 200% 100%; animation: v2-shimmer 1.8s infinite; }
++.v2-step-dot-active { animation: v2-pulseRing 2s infinite; }
++
++/* ---------- avatar gradient ring ---------- */
++.v2-avatar-ring { width: 96px; height: 96px; border-radius: 50%; padding: 4px; margin: 0 auto 0.9rem;
++  background: conic-gradient(from 0deg, #6366f1, #0d9488, #6366f1); animation: v2-spinSlow 6s linear infinite; }
++.v2-avatar-ring > div { width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center;
++  color: #fff; font-weight: 800; font-size: 1.9rem; background: linear-gradient(135deg, #1e3a8a, #3730a3); }
++
++/* ---------- marquee ---------- */
++.v2-marquee { overflow: hidden; white-space: nowrap;
++  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
++  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
++.v2-marquee-track { display: inline-flex; gap: 2.4rem; animation: v2-marquee 22s linear infinite; }
++
++/* ---------- login split layout ---------- */
++.v2-login-wrap { display: flex; align-items: stretch; justify-content: center; gap: 1.5rem; width: 100%; max-width: 980px; margin: 0 auto; padding: 1rem; }
++.v2-login-brand { flex: 1.1; border-radius: var(--radius-xl); overflow: hidden; position: relative; color: #fff; min-height: 480px;
++  display: flex; flex-direction: column; justify-content: center; padding: 2.5rem;
++  background: linear-gradient(135deg, #0f1e4d 0%, #1e3a8a 45%, #0d9488 135%); box-shadow: var(--shadow-lg); }
++.v2-login-form { flex: 1; display: flex; flex-direction: column; justify-content: center; }
++@media (max-width: 860px) { .v2-login-brand { display: none; } }
++
++/* ---------- accessibility ---------- */
++@media (prefers-reduced-motion: reduce) {
++  .v2-anim, .v2-float, .v2-blob, .v2-grad-text, .v2-bar-fill, .v2-marquee-track,
++  .v2-avatar-ring, .status-ACTIVE.v2-pulse, .v2-step-line.done::after, .v2-step-dot-active {
++    animation: none !important;
++  }
++  .v2-bar-fill { width: var(--v2-w, 50%) !important; }
++}
+diff --git a/frontend/src/pages/AdminDashboard.jsx b/frontend/src/pages/AdminDashboard.jsx
+index a8f0cb9..e3d5b61 100644
+--- a/frontend/src/pages/AdminDashboard.jsx
++++ b/frontend/src/pages/AdminDashboard.jsx
+@@ -1,7 +1,10 @@
+ import React, { useState, useEffect, useRef } from 'react';
+-import { BarChart2, PieChart, TrendingUp, Award, RefreshCw, DollarSign, Users, Layers, ShieldCheck, CheckCircle, Download, Upload, Table } from 'lucide-react';
++import { BarChart2, PieChart, Award, RefreshCw, DollarSign, Download, Upload, Table } from 'lucide-react';
+ import reportApi from '../api/reportApi';
+ import StatusBadge from '../components/StatusBadge';
++import PageHeader from '../components/PageHeader';
++import KpiCard from '../components/KpiCard';
++import AnimatedBar from '../components/AnimatedBar';
+ import { Link } from 'react-router-dom';
+ import axiosClient from '../api/axiosClient';
+ 
+@@ -31,7 +34,7 @@ export const AdminDashboard = () => {
+       setTopPolicies(topRes || []);
+       setMonthlyPremiums(mRes || []);
+     } catch (err) {
+-      console.error('Lỗi tải báo cáo từ MongoDB Aggregation', err);
++      console.error('Không tải được báo cáo', err);
+     } finally {
+       setLoading(false);
+     }
+@@ -63,7 +66,7 @@ export const AdminDashboard = () => {
+       link.click();
+       window.URL.revokeObjectURL(url);
+     } catch (err) {
+-      alert('Lỗi tải Excel template: ' + err.message);
++      alert('Không tải được file mẫu Excel: ' + err.message);
+     } finally {
+       setRatesLoading(false);
+     }
+@@ -80,10 +83,10 @@ export const AdminDashboard = () => {
+       const res = await axiosClient.post('/excel/import-rates', formData, {
+         headers: { 'Content-Type': 'multipart/form-data' }
+       });
+-      setImportMsg(`✅ Đã cập nhật ${Object.keys(res || {}).length} tỷ lệ phí thành công!`);
++      setImportMsg(`Đã cập nhật ${Object.keys(res || {}).length} tỷ lệ phí ✓`);
+       fetchCurrentRates();
+     } catch (err) {
+-      setImportMsg('❌ Lỗi import: ' + err.message);
++      setImportMsg('Không nhập được file: ' + err.message);
+     } finally {
+       setRatesLoading(false);
+       e.target.value = '';
+@@ -96,93 +99,58 @@ export const AdminDashboard = () => {
+ 
+   return (
+     <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+-      {/* Top Banner Header */}
+-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+-        <div>
+-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)' }}>Trung Tâm Báo Cáo Phân Tích Kế Toán Bảo Hiểm</h1>
+-          <p style={{ color: 'var(--text-muted)' }}>4 MongoDB Aggregation Pipelines xử lý trực tiếp trên tập dữ liệu lớn (Thống kê P09 & P10)</p>
+-        </div>
+-        <button onClick={fetchReports} className="btn btn-primary" style={{ padding: '0.6rem 1.25rem' }}>
+-          <RefreshCw size={18} />
+-          <span>Thực Thi Aggregation Pipelines</span>
+-        </button>
+-      </div>
++      <PageHeader
++        title="Báo cáo tổng hợp"
++        subtitle="Số liệu tính trực tiếp từ hệ thống, cập nhật theo thời gian thực"
++        delay="v2-d1"
++        actions={
++          <button onClick={fetchReports} className="btn" style={{ background: '#fff', color: 'var(--primary)', padding: '0.6rem 1.25rem', fontWeight: 700, borderRadius: 12, display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
++            <RefreshCw size={18} />
++            <span>Tải lại báo cáo</span>
++          </button>
++        }
++      />
+ 
+       {/* KPI Overview Summary Cards */}
+       <div className="grid-4" style={{ marginBottom: '2rem' }}>
+-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+-          <div className="user-avatar" style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary)', width: 50, height: 50 }}>
+-            <Layers size={24} />
+-          </div>
+-          <div>
+-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Tổng Số Đơn Bảo Hiểm</span>
+-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)' }}>
+-              {totalOverallCount.toLocaleString()} hợp đồng
+-            </div>
+-          </div>
+-        </div>
+-
+-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+-          <div className="user-avatar" style={{ backgroundColor: 'var(--secondary-light)', color: 'var(--secondary)', width: 50, height: 50 }}>
+-            <DollarSign size={24} />
+-          </div>
+-          <div>
+-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Tổng Phí Bảo Hiểm Ghi Nhận</span>
+-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--secondary)' }}>
+-              ${totalOverallPremium.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+-            </div>
+-          </div>
+-        </div>
+-
+-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+-          <div className="user-avatar" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--accent)', width: 50, height: 50 }}>
+-            <TrendingUp size={24} />
+-          </div>
+-          <div>
+-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Số Đơn Đang Hiệu Lực</span>
+-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent)' }}>
+-              {(statusCounts.find(s => s.status === 'ACTIVE')?.count || 0).toLocaleString()} đơn ACTIVE
+-            </div>
+-          </div>
+-        </div>
+-
+-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+-          <div className="user-avatar" style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary)', width: 50, height: 50 }}>
+-            <Award size={24} />
+-          </div>
+-          <div>
+-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Hợp Đồng Giá Trị Nhất</span>
+-            <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary)' }}>
+-              ${(topPolicies[0]?.totalPremium || 0).toLocaleString()} USD
+-            </div>
+-          </div>
+-        </div>
++        <KpiCard label="Tổng số hợp đồng" delay="v2-d2"
++          value={<>{totalOverallCount.toLocaleString()} <span style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-muted)' }}>hợp đồng</span></>}
++          sub="Tất cả trạng thái" colors={['#1e3a8a', '#6366f1']} />
++        <KpiCard label="Tổng phí đã ghi nhận" delay="v2-d3"
++          value={<span style={{ color: 'var(--secondary)' }}>${totalOverallPremium.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span style={{ fontSize: '1rem', fontWeight: 600 }}>USD</span></span>}
++          sub="Cộng dồn theo thời gian" colors={['#0d9488', '#14b8a6']} />
++        <KpiCard label="Số hợp đồng đang hiệu lực" delay="v2-d4"
++          value={<>{(statusCounts.find(s => s.status === 'ACTIVE')?.count || 0).toLocaleString()} <span style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-muted)' }}>hợp đồng</span></>}
++          sub="Trạng thái đang hiệu lực" colors={['#047857', '#10b981']} />
++        <KpiCard label="Hợp đồng giá trị nhất" delay="v2-d5"
++          value={<>${(topPolicies[0]?.totalPremium || 0).toLocaleString()} <span style={{ fontSize: '1rem', fontWeight: 600 }}>USD</span></>}
++          sub={topPolicies[0]?.policyNumber || 'Chưa có dữ liệu'} colors={['#b45309', '#f59e0b']} />
+       </div>
+ 
+       {loading ? (
+         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+           <RefreshCw size={32} style={{ animation: 'spin 1s linear infinite', marginBottom: '1rem' }} />
+-          <p>Đang xử lý MongoDB Aggregation Pipeline ($group, $match, $sort, $limit)...</p>
++          <p>Đang tổng hợp số liệu...</p>
+         </div>
+       ) : (
+         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+           {/* Section 1 & 2 Grid: Count by Status & Premium by Status */}
+           <div className="grid-2">
+             {/* Report 1: Count by Status */}
+-            <div className="card">
++            <div className="card v2-card-lift v2-anim">
+               <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                 <PieChart size={20} />
+-                <span>1. Số Lượng Đơn Theo Trạng Thái Vòng Đời</span>
++                <span>1. Số hợp đồng theo trạng thái</span>
+               </h3>
+-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Pipeline `$group` gom nhóm theo `status` và tính `$sum: 1`</p>
++              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Số hợp đồng phân bổ theo từng trạng thái</p>
+ 
+               <div className="table-container">
+                 <table className="custom-table">
+                   <thead>
+                     <tr>
+-                      <th>Trạng Thái Vòng Đời</th>
+-                      <th>Số Lượng Đơn</th>
+-                      <th>Tỷ Lệ Phần Trăm</th>
++                      <th>Trạng thái</th>
++                      <th>Số lượng</th>
++                      <th>Tỷ lệ %</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+@@ -191,14 +159,9 @@ export const AdminDashboard = () => {
+                       return (
+                         <tr key={sc.status}>
+                           <td><StatusBadge status={sc.status} /></td>
+-                          <td><strong style={{ fontSize: '1.05rem', color: 'var(--primary)' }}>{sc.count?.toLocaleString()}</strong> đơn</td>
+-                          <td>
+-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+-                              <div style={{ flex: 1, height: 8, backgroundColor: 'var(--border)', borderRadius: 4, overflow: 'hidden' }}>
+-                                <div style={{ width: `${pct}%`, height: '100%', backgroundColor: 'var(--primary)' }} />
+-                              </div>
+-                              <span style={{ fontSize: '0.8rem', width: 45, fontWeight: 700 }}>{pct}%</span>
+-                            </div>
++                          <td><strong style={{ fontSize: '1.05rem', color: 'var(--primary)' }}>{sc.count?.toLocaleString()}</strong> hợp đồng</td>
++                          <td style={{ minWidth: 220 }}>
++                            <AnimatedBar percent={pct} value={`${pct}%`} />
+                           </td>
+                         </tr>
+                       );
+@@ -209,20 +172,20 @@ export const AdminDashboard = () => {
+             </div>
+ 
+             {/* Report 2: Total Premium by Status */}
+-            <div className="card">
++            <div className="card v2-card-lift v2-anim">
+               <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                 <DollarSign size={20} />
+-                <span>2. Tổng Phí Bảo Hiểm Doanh Thu Theo Trạng Thái</span>
++                <span>2. Tổng phí theo trạng thái</span>
+               </h3>
+-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Pipeline `$group` tổng hợp tích lũy `$sum: "$totalPremium"`</p>
++              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Tổng phí và phí trung bình theo trạng thái</p>
+ 
+               <div className="table-container">
+                 <table className="custom-table">
+                   <thead>
+                     <tr>
+-                      <th>Trạng Thái Vòng Đời</th>
+-                      <th>Tổng Phí Bảo Hiểm</th>
+-                      <th>Trung Bình / Đơn</th>
++                      <th>Trạng thái</th>
++                      <th>Tổng phí</th>
++                      <th>Trung bình / hợp đồng</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+@@ -245,21 +208,21 @@ export const AdminDashboard = () => {
+           {/* Section 3 & 4 Grid: Top 5 Policies & Monthly Revenues */}
+           <div className="grid-2">
+             {/* Report 3: Top 5 Highest Premium Policies */}
+-            <div className="card">
++            <div className="card v2-card-lift v2-anim">
+               <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                 <Award size={20} />
+-                <span>3. Top 5 Hợp Đồng Bảo Hiểm Phí Khủng Nhất</span>
++                <span>3. Top 5 hợp đồng phí cao nhất</span>
+               </h3>
+-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Pipeline `$sort: totalPremium DESC` kết hợp `$limit: 5`</p>
++              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Các hợp đồng có tổng phí cao nhất</p>
+ 
+               <div className="table-container">
+                 <table className="custom-table">
+                   <thead>
+                     <tr>
+-                      <th>Hạng</th>
+-                      <th>Mã Hợp Đồng</th>
+-                      <th>Bên Mua Bảo Hiểm</th>
+-                      <th>Tổng Phí Quy Đổi</th>
++                      <th>Top</th>
++                      <th>Số hợp đồng</th>
++                      <th>Bên mua</th>
++                      <th>Tổng phí quy đổi</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+@@ -283,20 +246,20 @@ export const AdminDashboard = () => {
+             </div>
+ 
+             {/* Report 4: Monthly Premium Breakdown */}
+-            <div className="card">
++            <div className="card v2-card-lift v2-anim">
+               <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                 <BarChart2 size={20} />
+-                <span>4. Thống Kế Phí Theo Tháng Hiệu Lực (Monthly Trends)</span>
++                <span>4. Phí theo tháng hiệu lực</span>
+               </h3>
+-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Pipeline chiết xuất `$year` và `$month` từ `effectiveDate`</p>
++              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Tổng phí theo tháng hợp đồng có hiệu lực</p>
+ 
+               <div className="table-container">
+                 <table className="custom-table">
+                   <thead>
+                     <tr>
+-                      <th>Tháng / Năm</th>
+-                      <th>Số Lượng Hợp Đồng</th>
+-                      <th>Tổng Doanh Thu Phí</th>
++                      <th>Tháng/Năm</th>
++                      <th>Số lượng hợp đồng</th>
++                      <th>Tổng phí</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+@@ -321,10 +284,10 @@ export const AdminDashboard = () => {
+               <div>
+                 <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                   <Table size={22} />
+-                  <span>5. Ma Trận Định Mức Tỷ Lệ Phí Bảo Hiểm (Excel In / Out Matrix)</span>
++                  <span>5. Bảng tỷ lệ phí (nhập/xuất Excel)</span>
+                 </h3>
+                 <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+-                  Công cụ dành riêng cho Chuyên viên Định phí (Actuary): Xuất ma trận định phí Excel, hiệu chỉnh công thức/hệ số rủi ro, và nạp (import) vào hệ thống để áp dụng tức thì.
++                  Dành cho chuyên viên định phí: xuất bảng tỷ lệ ra Excel, chỉnh công thức và hệ số rồi tải lên để áp dụng ngay.
+                 </p>
+               </div>
+ 
+@@ -336,7 +299,7 @@ export const AdminDashboard = () => {
+                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600 }}
+                 >
+                   <Download size={16} />
+-                  <span>Xuất Ma Trận Excel (.xlsx)</span>
++                  <span>Tải bảng tỷ lệ (Excel)</span>
+                 </button>
+ 
+                 <input
+@@ -354,7 +317,7 @@ export const AdminDashboard = () => {
+                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600 }}
+                 >
+                   <Upload size={16} />
+-                  <span>Nạp File Excel Cập Nhật Tỷ Lệ</span>
++                  <span>Tải lên file Excel cập nhật tỷ lệ</span>
+                 </button>
+               </div>
+             </div>
+@@ -366,8 +329,8 @@ export const AdminDashboard = () => {
+                 marginBottom: '1rem',
+                 fontSize: '0.9rem',
+                 fontWeight: 600,
+-                backgroundColor: importMsg.startsWith('✅') ? 'var(--status-active-bg)' : 'var(--status-cancelled-bg)',
+-                color: importMsg.startsWith('✅') ? 'var(--status-active-text)' : 'var(--status-cancelled-text)'
++                backgroundColor: importMsg.startsWith('Không') ? 'var(--status-cancelled-bg)' : 'var(--status-active-bg)',
++                color: importMsg.startsWith('Không') ? 'var(--status-cancelled-text)' : 'var(--status-active-text)'
+               }}>
+                 {importMsg}
+               </div>
+@@ -375,7 +338,7 @@ export const AdminDashboard = () => {
+ 
+             <div style={{ background: 'var(--bg-main)', borderRadius: 'var(--radius-md)', padding: '1rem' }}>
+               <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.75rem', textTransform: 'uppercase' }}>
+-                Bảng Tỷ Lệ Cơ Sở (Base Rates) Hiện Hành Trên Bộ Nhớ Hệ Thống:
++                Bảng tỷ lệ phí đang áp dụng:
+               </div>
+               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.75rem' }}>
+                 {Object.entries(currentRates).length > 0 ? (
+diff --git a/frontend/src/pages/BenchmarkView.jsx b/frontend/src/pages/BenchmarkView.jsx
+index 05f607c..133ed7e 100644
+--- a/frontend/src/pages/BenchmarkView.jsx
++++ b/frontend/src/pages/BenchmarkView.jsx
+@@ -1,5 +1,5 @@
+ import React, { useState } from 'react';
+-import { Cpu, Zap, Database, CheckCircle, Clock, ShieldCheck, Play, AlertCircle } from 'lucide-react';
++import { Zap, Database, CheckCircle } from 'lucide-react';
+ import reportApi from '../api/reportApi';
+ 
+ export const BenchmarkView = () => {
+@@ -15,10 +15,10 @@ export const BenchmarkView = () => {
+     try {
+       const count = await reportApi.generate50k();
+       setGenCount(count || 50000);
+-      alert(`🎉 Đã sinh & bulk insert thành công ${count?.toLocaleString() || 50000} Hợp đồng Bảo hiểm vào MongoDB database 'insurance'!`);
++      alert(`Đã tạo ${count?.toLocaleString() || '50.000'} hợp đồng mẫu ✓`);
+     } catch (err) {
+-      console.error('Lỗi khi sinh 50k document', err);
+-      setErrorMsg(err.message || 'Không thể thực thi script nạp 50k document');
++      console.error('Tạo dữ liệu mẫu thất bại', err);
++      setErrorMsg(err.message || 'Không tạo được dữ liệu mẫu, bạn thử lại nhé');
+     } finally {
+       setGenerating(false);
+     }
+@@ -31,8 +31,8 @@ export const BenchmarkView = () => {
+       const result = await reportApi.runBenchmark();
+       setBenchmarkResult(result);
+     } catch (err) {
+-      console.error('Lỗi chạy benchmark', err);
+-      setErrorMsg(err.message || 'Không thể đo lường chỉ số benchmark');
++      console.error('Chạy kiểm tra thất bại', err);
++      setErrorMsg(err.message || 'Không đo được hiệu năng, bạn thử lại nhé');
+     } finally {
+       setRunning(false);
+     }
+@@ -41,9 +41,9 @@ export const BenchmarkView = () => {
+   return (
+     <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+       {/* Title Header */}
+-      <div style={{ marginBottom: '2rem' }}>
+-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)' }}>Thử Nghiệm Hiệu Năng Benchmark 50,000 Bản Ghi (Thử nghiệm P11)</h1>
+-        <p style={{ color: 'var(--text-muted)' }}>Đo lường thời gian phản hồi, chỉ số quét bản ghi `totalDocsExamined` & `winningPlan` khi sử dụng Compound Index trên MongoDB</p>
++      <div className="v2-anim v2-d1" style={{ marginBottom: '2rem' }}>
++        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)' }}>Kiểm tra tốc độ hệ thống</h1>
++        <p style={{ color: 'var(--text-muted)' }}>Đo thời gian phản hồi và hiệu quả truy vấn dữ liệu</p>
+       </div>
+ 
+       {errorMsg && (
+@@ -54,60 +54,60 @@ export const BenchmarkView = () => {
+ 
+       {/* Action Cards Grid */}
+       <div className="grid-2" style={{ marginBottom: '2rem' }}>
+-        <div className="card">
++        <div className="card v2-card-lift v2-anim">
+           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.25rem' }}>
+             <div className="user-avatar" style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary)', width: 48, height: 48 }}>
+               <Database size={24} />
+             </div>
+             <div>
+-              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>1. Sinh Dữ Liệu 50,000 Hợp Đồng Mẫu</h3>
+-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Khởi tạo ngẫu nhiên 50,000 hợp đồng hợp lệ (Bulk Insert MongoTemplate)</p>
++              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>1. Tạo 50.000 hợp đồng mẫu</h3>
++              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Tạo ngẫu nhiên 50.000 hợp đồng hợp lệ để test</p>
+             </div>
+           </div>
+ 
+           <button onClick={handleGenerate50k} className="btn btn-primary" style={{ width: '100%', padding: '0.8rem' }} disabled={generating}>
+-            {generating ? 'Đang nạp 50,000 hợp đồng vào MongoDB...' : 'Chạy Script Sinh 50k Document'}
++            {generating ? 'Đang tạo 50.000 hợp đồng mẫu...' : 'Tạo dữ liệu mẫu'}
+           </button>
+ 
+           {genCount && (
+             <div style={{ marginTop: '0.85rem', padding: '0.65rem 0.85rem', backgroundColor: 'var(--status-active-bg)', color: 'var(--status-active-text)', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+               <CheckCircle size={18} />
+-              <span>Tổng số Document đang có trong CSDL 'insurance': {genCount.toLocaleString()} hợp đồng</span>
++              <span>Đang có {genCount.toLocaleString()} hợp đồng mẫu trong hệ thống</span>
+             </div>
+           )}
+         </div>
+ 
+-        <div className="card">
++        <div className="card v2-card-lift v2-anim">
+           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.25rem' }}>
+             <div className="user-avatar" style={{ backgroundColor: 'var(--secondary-light)', color: 'var(--secondary)', width: 48, height: 48 }}>
+               <Zap size={24} />
+             </div>
+             <div>
+-              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>2. Chạy Thử Nghiệm Benchmark</h3>
+-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Thực thi 3 câu lệnh truy vấn cốt lõi và trích xuất chỉ số `winningPlan`</p>
++              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>2. Đo tốc độ xử lý</h3>
++              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Chạy 3 truy vấn chính và ghi lại kết quả</p>
+             </div>
+           </div>
+ 
+           <button onClick={handleRunBenchmark} className="btn btn-secondary" style={{ width: '100%', padding: '0.8rem' }} disabled={running}>
+-            {running ? 'Đang thực thi 3 câu lệnh truy vấn Index Scan...' : 'Đo Lường Chỉ Số Hiệu Năng (Run Benchmark)'}
++            {running ? 'Đang chạy các truy vấn đo tốc độ...' : 'Bắt đầu đo'}
+           </button>
+         </div>
+       </div>
+ 
+       {/* Benchmark Results Display */}
+       {benchmarkResult && (
+-        <div className="card">
++        <div className="card v2-card-lift v2-anim">
+           <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+             <CheckCircle size={22} style={{ color: 'var(--secondary)' }} />
+-            <span>Kết Quả Đo Lường Hiệu Năng MongoDB Indexing (Real Runtime Execution)</span>
++            <span>Kết quả đo hiệu năng</span>
+           </h3>
+ 
+           <div style={{ padding: '1rem 1.25rem', backgroundColor: 'var(--primary-light)', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+             <div>
+-              <strong>Tổng số Document quét thực tế:</strong> <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>{benchmarkResult.totalDocsInCollection?.toLocaleString()} hợp đồng</span>
++              <strong>Tổng số bản ghi đã quét:</strong> <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>{benchmarkResult.totalDocsInCollection?.toLocaleString()} hợp đồng</span>
+             </div>
+             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+-              <strong>Thời điểm đo:</strong> {new Date(benchmarkResult.benchmarkTimestamp).toLocaleString('vi-VN')}
++              <strong>Đo lúc:</strong> {new Date(benchmarkResult.benchmarkTimestamp).toLocaleString('vi-VN')}
+             </div>
+           </div>
+ 
+@@ -116,18 +116,18 @@ export const BenchmarkView = () => {
+               <div key={idx} style={{ padding: '1.25rem', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-surface)' }}>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                   <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>{m.queryName}</h4>
+-                  <span className="brand-badge" style={{ fontSize: '0.8rem' }}>Stage: {m.winningPlanStage}</span>
++                  <span className="brand-badge" style={{ fontSize: '0.8rem' }}>Giai đoạn: {m.winningPlanStage}</span>
+                 </div>
+                 <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>{m.queryDescription}</p>
+ 
+                 <div className="grid-4">
+                   <div style={{ padding: '0.75rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-sm)' }}>
+-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Thời gian thực thi</span>
++                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Thời gian chạy</span>
+                     <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--secondary)' }}>{m.executionTimeMillis} ms</div>
+                   </div>
+ 
+                   <div style={{ padding: '0.75rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-sm)' }}>
+-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Số bản ghi bị duyệt</span>
++                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Số bản ghi đã duyệt</span>
+                     <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary)' }}>{m.totalDocsExamined}</div>
+                   </div>
+ 
+@@ -137,7 +137,7 @@ export const BenchmarkView = () => {
+                   </div>
+ 
+                   <div style={{ padding: '0.75rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-sm)' }}>
+-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Index Tối Ưu</span>
++                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Đã tối ưu</span>
+                     <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--primary)', marginTop: '0.2rem' }}>{m.indexName}</div>
+                   </div>
+                 </div>
+diff --git a/frontend/src/pages/BuyInsurance.jsx b/frontend/src/pages/BuyInsurance.jsx
+index 9164cbb..f0e92ed 100644
+--- a/frontend/src/pages/BuyInsurance.jsx
++++ b/frontend/src/pages/BuyInsurance.jsx
+@@ -212,17 +212,17 @@ export const BuyInsurance = ({ user }) => {
+ 
+   // Step 1 validation
+   const validateStep1 = () => {
+-    if (!insuredInfo.name.trim()) return 'Vui lòng nhập tên Bên mua bảo hiểm';
+-    if (!insuredInfo.email.trim() || !insuredInfo.email.includes('@')) return 'Địa chỉ Gmail không hợp lệ';
+-    if (!insuredInfo.phone.trim()) return 'Vui lòng nhập số điện thoại liên hệ';
+-    if (locations.length === 0) return 'Vui lòng khai báo ít nhất 01 địa điểm bảo hiểm';
++    if (!insuredInfo.name.trim()) return 'Bạn nhập tên bên mua bảo hiểm nhé';
++    if (!insuredInfo.email.trim() || !insuredInfo.email.includes('@')) return 'Email chưa đúng định dạng, bạn kiểm tra lại nhé';
++    if (!insuredInfo.phone.trim()) return 'Bạn nhập số điện thoại liên hệ nhé';
++    if (locations.length === 0) return 'Bạn khai báo ít nhất 1 địa điểm nhé';
+     for (let i = 0; i < locations.length; i++) {
+       if (!locations[i].address.trim()) {
+         return `Vui lòng nhập địa chỉ cụ thể cho ${locations[i].name || `Địa điểm ${i + 1}`}`;
+       }
+     }
+     const effDate = new Date(effectiveDateStr);
+-    if (effDate <= new Date()) return 'Ngày hiệu lực phải từ ngày mai trở đi';
++    if (effDate <= new Date()) return 'Bạn chọn ngày hiệu lực từ ngày mai trở đi nhé';
+     return null;
+   };
+ 
+@@ -236,7 +236,7 @@ export const BuyInsurance = ({ user }) => {
+   const handleNextStep2 = async () => {
+     const activeCovs = selectedCoverages.filter((c) => c.selected);
+     if (activeCovs.length === 0) {
+-      setErrorMsg('Vui lòng chọn ít nhất 01 gói quyền lợi bảo hiểm');
++      setErrorMsg('Bạn chọn ít nhất 1 gói quyền lợi nhé');
+       return;
+     }
+     setErrorMsg('');
+@@ -262,7 +262,7 @@ export const BuyInsurance = ({ user }) => {
+       }));
+ 
+     if (activeCoverages.length === 0) {
+-      setErrorMsg('Vui lòng chọn ít nhất một gói quyền lợi bảo hiểm');
++      setErrorMsg('Bạn chọn ít nhất 1 gói quyền lợi nhé');
+       setLoading(false);
+       return;
+     }
+@@ -307,7 +307,7 @@ export const BuyInsurance = ({ user }) => {
+         try {
+           await policyApi.transitionStatus(policyNum, {
+             targetStatus: 'QUOTED',
+-            reason: 'Đã hoàn tất tính phí và tạo bản báo giá chính thức từ bảng quyền lợi',
++            reason: 'Đã tính xong phí và tạo báo giá chính thức',
+             actor: insuredInfo.name?.trim() || 'Khách hàng',
+           });
+         } catch (transErr) {
+@@ -317,7 +317,7 @@ export const BuyInsurance = ({ user }) => {
+       navigate(`/policies/${policyNum}?created=true&mode=${asDraft ? 'draft' : 'quoted'}`);
+     } catch (err) {
+       console.error('Failed to create policy', err);
+-      setErrorMsg(err.message || 'Không thể tạo đơn bảo hiểm. Vui lòng thử lại.');
++      setErrorMsg(err.message || 'Chưa tạo được hợp đồng, bạn thử lại nhé.');
+     } finally {
+       setLoading(false);
+     }
+@@ -340,29 +340,29 @@ export const BuyInsurance = ({ user }) => {
+ 
+   const stepConfig = [
+     { num: 1, label: 'Bên mua & Địa điểm' },
+-    { num: 2, label: 'Chọn Quyền lợi' },
+-    { num: 3, label: 'Bảng phí xác nhận' },
+-    { num: 4, label: 'Nộp Hồ sơ' },
++    { num: 2, label: 'Chọn quyền lợi' },
++    { num: 3, label: 'Tóm tắt phí' },
++    { num: 4, label: 'Gửi yêu cầu' },
+   ];
+ 
+   return (
+     <div style={{ maxWidth: 900, margin: '0 auto' }}>
+       {/* Page Header */}
+-      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
++      <div className="v2-anim v2-d1" style={{ textAlign: 'center', marginBottom: '2rem' }}>
+         <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--primary)' }}>
+-          Yêu Cầu Cấp Đơn Bảo Hiểm Doanh Nghiệp
++          Mua bảo hiểm doanh nghiệp
+         </h1>
+         <p style={{ color: 'var(--text-muted)' }}>
+-          Phí bảo hiểm được tính tự động theo bảng định mức nghiệp vụ — Hoàn tất trong 4 bước
++          Phí tính tự động theo bảng giá — chỉ 4 bước là xong
+         </p>
+       </div>
+ 
+       {/* Step Indicator */}
+-      <div style={{ display: 'flex', justifyContent: 'center', gap: '0', marginBottom: '2.5rem' }}>
++      <div className="v2-anim v2-d2" style={{ display: 'flex', justifyContent: 'center', gap: '0', marginBottom: '2.5rem' }}>
+         {stepConfig.map((s, idx) => (
+           <React.Fragment key={s.num}>
+             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
+-              <div style={{
++              <div className={step === s.num ? 'v2-step-dot-active' : ''} style={{
+                 width: 44,
+                 height: 44,
+                 borderRadius: '50%',
+@@ -379,7 +379,7 @@ export const BuyInsurance = ({ user }) => {
+               </span>
+             </div>
+             {idx < stepConfig.length - 1 && (
+-              <div style={{ flex: 1, height: 2, backgroundColor: step > s.num ? 'var(--secondary)' : 'var(--border)', alignSelf: 'flex-start', marginTop: 21, minWidth: 32, transition: 'all 0.3s' }} />
++              <div className={`v2-step-line ${step > s.num ? 'done' : ''}`} />
+             )}
+           </React.Fragment>
+         ))}
+@@ -393,30 +393,30 @@ export const BuyInsurance = ({ user }) => {
+         </div>
+       )}
+ 
+-      <div className="card" style={{ padding: '2rem' }}>
++      <div className="card v2-anim v2-d3" style={{ padding: '2rem' }}>
+ 
+         {/* ─── STEP 1: INSURED INFO ─── */}
+         {step === 1 && (
+           <div>
+             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+               <User size={22} />
+-              <span>Bước 1: Thông Tin Bên Mua Bảo Hiểm & Địa Điểm</span>
++              <span>Bước 1: Thông tin bên mua & địa điểm</span>
+             </h3>
+ 
+             <div className="grid-2" style={{ marginBottom: '1.25rem' }}>
+               <div className="form-group">
+-                <label className="form-label">Loại Đối Tượng Được Bảo Hiểm <span style={{ color: 'red' }}>*</span></label>
++                <label className="form-label">Đối tượng được bảo hiểm <span style={{ color: 'red' }}>*</span></label>
+                 <select
+                   className="form-select"
+                   value={insuredInfo.type}
+                   onChange={(e) => setInsuredInfo({ ...insuredInfo, type: e.target.value })}
+                 >
+-                  <option value="BUSINESS">Doanh Nghiệp / Tổ Chức (BUSINESS)</option>
+-                  <option value="INDIVIDUAL">Cá Nhân / Hộ Kinh Doanh (INDIVIDUAL)</option>
++                  <option value="BUSINESS">Doanh nghiệp / Tổ chức</option>
++                  <option value="INDIVIDUAL">Cá nhân / Hộ kinh doanh</option>
+                 </select>
+               </div>
+               <div className="form-group">
+-                <label className="form-label">Mã Định Danh Đối Tượng (Insured ID)</label>
++                <label className="form-label">Mã định danh</label>
+                 <input
+                   type="text"
+                   className="form-input"
+@@ -431,7 +431,7 @@ export const BuyInsurance = ({ user }) => {
+                   value={insuredInfo.name} onChange={(e) => setInsuredInfo({ ...insuredInfo, name: e.target.value })} required />
+               </div>
+               <div className="form-group">
+-                <label className="form-label">Gmail nhận Hợp đồng & thông báo <span style={{ color: 'red' }}>*</span></label>
++                <label className="form-label">Email nhận hợp đồng & thông báo <span style={{ color: 'red' }}>*</span></label>
+                 <input type="email" className="form-input" placeholder="khachhang@gmail.com"
+                   value={insuredInfo.email} onChange={(e) => setInsuredInfo({ ...insuredInfo, email: e.target.value })} required />
+               </div>
+@@ -441,14 +441,14 @@ export const BuyInsurance = ({ user }) => {
+                   value={insuredInfo.phone} onChange={(e) => setInsuredInfo({ ...insuredInfo, phone: e.target.value })} required />
+               </div>
+               <div className="form-group">
+-                <label className="form-label">Ngày bắt đầu hiệu lực bảo hiểm <span style={{ color: 'red' }}>*</span></label>
++                <label className="form-label">Ngày hiệu lực <span style={{ color: 'red' }}>*</span></label>
+                 <input type="date" className="form-input" value={effectiveDateStr}
+                   onChange={(e) => setEffectiveDateStr(e.target.value)} min={new Date(Date.now() + 86400000).toISOString().split('T')[0]} required />
+               </div>
+             </div>
+ 
+             <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+-              <label className="form-label">Địa chỉ Trụ sở chính Bên mua bảo hiểm</label>
++              <label className="form-label">Địa chỉ bên mua bảo hiểm</label>
+               <input type="text" className="form-input" placeholder="123 Đường ABC, Phường XYZ, Q.1, TP.HCM"
+                 value={insuredInfo.address} onChange={(e) => setInsuredInfo({ ...insuredInfo, address: e.target.value })} />
+             </div>
+@@ -459,10 +459,10 @@ export const BuyInsurance = ({ user }) => {
+                 <div>
+                   <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                     <Building2 size={20} style={{ color: 'var(--primary)' }} />
+-                    <span>Danh Sách Địa Điểm Cần Được Bảo Hiểm ({locations.length})</span>
++                    <span>Danh sách địa điểm được bảo hiểm ({locations.length})</span>
+                   </h4>
+                   <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.25rem 0 0' }}>
+-                    Khai báo các nhà xưởng, kho bãi, văn phòng chi nhánh thuộc phạm vi bảo hiểm của hợp đồng
++                    Khai báo nhà xưởng, kho bãi, văn phòng được bảo hiểm trong hợp đồng này
+                   </p>
+                 </div>
+                 <button
+@@ -481,7 +481,7 @@ export const BuyInsurance = ({ user }) => {
+                   }}
+                 >
+                   <PlusCircle size={16} />
+-                  <span>Thêm Địa Điểm</span>
++                  <span>Thêm địa điểm</span>
+                 </button>
+               </div>
+ 
+@@ -541,7 +541,7 @@ export const BuyInsurance = ({ user }) => {
+                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.75rem' }}>
+                       <div>
+                         <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
+-                          Tên Định Danh / Vai Trò
++                          Tên hiển thị
+                         </label>
+                         <input
+                           type="text"
+@@ -554,7 +554,7 @@ export const BuyInsurance = ({ user }) => {
+                       </div>
+                       <div>
+                         <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
+-                          Địa Chỉ Rủi Ro Cụ Thể <span style={{ color: 'red' }}>*</span>
++                          Địa chỉ cụ thể <span style={{ color: 'red' }}>*</span>
+                         </label>
+                         <input
+                           type="text"
+@@ -580,14 +580,14 @@ export const BuyInsurance = ({ user }) => {
+                     style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem', gap: '0.35rem' }}
+                   >
+                     <PlusCircle size={15} />
+-                    <span>+ Thêm địa điểm rủi ro khác</span>
++                    <span>+ Thêm địa điểm khác</span>
+                   </button>
+                 </div>
+               )}
+             </div>
+ 
+             <button onClick={handleNextStep1} className="btn btn-primary" style={{ width: '100%', padding: '0.85rem' }}>
+-              <span>Tiếp Theo: Lựa Chọn Gói Quyền Lợi ({locations.length} Địa Điểm)</span>
++              <span>Tiếp theo: chọn quyền lợi ({locations.length} địa điểm)</span>
+               <ArrowRight size={18} />
+             </button>
+           </div>
+@@ -598,10 +598,10 @@ export const BuyInsurance = ({ user }) => {
+           <div>
+             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+               <ShieldCheck size={22} />
+-              <span>Bước 2: Lựa Chọn Gói Quyền Lợi & Điều Kiện Bảo Hiểm</span>
++              <span>Bước 2: Chọn quyền lợi bảo hiểm</span>
+             </h3>
+             <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
+-              Phí được tính theo công thức: <strong>Hạn mức × Tỷ lệ phí gốc × Hệ số thời hạn × Hệ số loại gói × Chiết khấu miễn trừ</strong>
++              Cách tính phí: <strong>Hạn mức × Tỷ lệ phí gốc × Hệ số thời hạn × Hệ số loại gói × Chiết khấu miễn thường</strong>
+             </p>
+ 
+             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+@@ -634,17 +634,17 @@ export const BuyInsurance = ({ user }) => {
+                     <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+                         <div>
+-                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Hạn Mức Bồi Thường Tối Đa ($USD)</label>
++                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Hạn mức bồi thường tối đa (USD)</label>
+                           <input type="number" className="form-input" value={cov.limit} min={10000} step={10000}
+                             onChange={(e) => updateCovField(cov.coverageCode, 'limit', Number(e.target.value))} />
+                         </div>
+                         <div>
+-                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Mức Miễn Trừ Bảo Hiểm ($USD)</label>
++                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Mức miễn thường (USD)</label>
+                           <input type="number" className="form-input" value={cov.deductible} min={0} step={500}
+                             onChange={(e) => updateCovField(cov.coverageCode, 'deductible', Number(e.target.value))} />
+                         </div>
+                         <div>
+-                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Loại Gói Bảo Hiểm</label>
++                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Loại gói bảo hiểm</label>
+                           <select className="form-select" value={cov.coverageType}
+                             onChange={(e) => updateCovField(cov.coverageCode, 'coverageType', e.target.value)}>
+                             {COVERAGE_TYPES.map((t) => (
+@@ -653,7 +653,7 @@ export const BuyInsurance = ({ user }) => {
+                           </select>
+                         </div>
+                         <div>
+-                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Thời Hạn Bảo Hiểm</label>
++                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Thời hạn bảo hiểm</label>
+                           <select className="form-select" value={cov.termMonths}
+                             onChange={(e) => updateCovField(cov.coverageCode, 'termMonths', Number(e.target.value))}>
+                             {TERM_OPTIONS.map((t) => (
+@@ -676,7 +676,7 @@ export const BuyInsurance = ({ user }) => {
+                 {calculating ? (
+                   <><RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} /><span>Đang tính phí...</span></>
+                 ) : (
+-                  <><Calculator size={18} /><span>Xác Nhận & Tính Phí Chính Thức</span></>
++                  <><Calculator size={18} /><span>Xác nhận & tính phí chính thức</span></>
+                 )}
+               </button>
+             </div>
+@@ -688,12 +688,12 @@ export const BuyInsurance = ({ user }) => {
+           <div>
+             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.25rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+               <Calculator size={22} />
+-              <span>Bước 3: Bảng Tổng Hợp Phí Bảo Hiểm Quy Chuẩn</span>
++              <span>Bước 3: Tóm tắt phí</span>
+             </h3>
+ 
+             {/* Total premium highlight */}
+             <div style={{ padding: '1.75rem', background: 'linear-gradient(135deg, var(--primary) 0%, #1e40af 100%)', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', textAlign: 'center', color: 'white' }}>
+-              <span style={{ fontSize: '0.85rem', opacity: 0.85, textTransform: 'uppercase', fontWeight: 700 }}>Tổng Phí Bảo Hiểm Toàn Bộ Hợp Đồng</span>
++              <span style={{ fontSize: '0.85rem', opacity: 0.85, textTransform: 'uppercase', fontWeight: 700 }}>Tổng phí toàn hợp đồng</span>
+               <div style={{ fontSize: '2.8rem', fontWeight: 900, margin: '0.35rem 0' }}>
+                 ${getTotalPremium().toLocaleString('en-US', { minimumFractionDigits: 2 })}
+               </div>
+@@ -706,7 +706,7 @@ export const BuyInsurance = ({ user }) => {
+             <div style={{ padding: '1rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)', marginBottom: '1.25rem', border: '1px solid var(--border)' }}>
+               <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                 <Building2 size={16} />
+-                <span>Phạm Vi {locations.length} Địa Điểm Bảo Hiểm Áp Dụng:</span>
++                <span>Các địa điểm được bảo hiểm ({locations.length}):</span>
+               </h4>
+               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                 {locations.map((loc, idx) => (
+@@ -723,13 +723,13 @@ export const BuyInsurance = ({ user }) => {
+               <table className="custom-table">
+                 <thead>
+                   <tr>
+-                    <th>Gói Quyền Lợi</th>
+-                    <th>Loại Gói</th>
+-                    <th>Hạn Mức</th>
+-                    <th>Miễn Trừ</th>
+-                    <th>Thời Hạn</th>
+-                    <th>Tỷ Lệ Phí</th>
+-                    <th style={{ textAlign: 'right' }}>Phí / Địa Điểm ($USD)</th>
++                    <th>Gói quyền lợi</th>
++                    <th>Loại gói</th>
++                    <th>Hạn mức</th>
++                    <th>Miễn thường</th>
++                    <th>Thời hạn</th>
++                    <th>Tỷ lệ phí</th>
++                    <th style={{ textAlign: 'right' }}>Phí / địa điểm (USD)</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+@@ -757,14 +757,14 @@ export const BuyInsurance = ({ user }) => {
+                 </tbody>
+                 <tfoot>
+                   <tr style={{ backgroundColor: 'var(--primary-light)' }}>
+-                    <td colSpan={6} style={{ fontWeight: 800, textAlign: 'right' }}>PHÍ BẢO HIỂM MỖI ĐỊA ĐIỂM:</td>
++                    <td colSpan={6} style={{ fontWeight: 800, textAlign: 'right' }}>Phí bảo hiểm mỗi địa điểm:</td>
+                     <td style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '1rem', textAlign: 'right' }}>
+                       ${getPerLocationPremium().toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                     </td>
+                   </tr>
+                   <tr style={{ backgroundColor: 'var(--primary)', color: 'white' }}>
+                     <td colSpan={6} style={{ fontWeight: 900, textAlign: 'right', color: 'white' }}>
+-                      TỔNG PHÍ HỢP ĐỒNG ({locations.length} ĐỊA ĐIỂM):
++                      Tổng phí hợp đồng ({locations.length} địa điểm):
+                     </td>
+                     <td style={{ fontWeight: 900, color: 'white', fontSize: '1.15rem', textAlign: 'right' }}>
+                       ${getTotalPremium().toLocaleString('en-US', { minimumFractionDigits: 2 })}
+@@ -776,7 +776,7 @@ export const BuyInsurance = ({ user }) => {
+ 
+             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', padding: '0.75rem 1rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+               <Info size={16} style={{ color: 'var(--secondary)', flexShrink: 0 }} />
+-              <span>Phí được tính tự động theo công thức nghiệp vụ cho từng địa điểm rủi ro. Phí chính thức sẽ được phê duyệt tại bước báo phí.</span>
++              <span>Phí được tính tự động theo công thức cho từng địa điểm. Phí chính thức sẽ được duyệt ở bước báo giá.</span>
+             </div>
+ 
+             <div style={{ display: 'flex', gap: '1rem' }}>
+@@ -784,7 +784,7 @@ export const BuyInsurance = ({ user }) => {
+                 <ArrowLeft size={18} /><span>Điều chỉnh</span>
+               </button>
+               <button onClick={() => setStep(4)} className="btn btn-primary" style={{ flex: 2 }}>
+-                <span>Xác Nhận Đơn Mua ({locations.length} Địa Điểm)</span>
++                <span>Xác nhận đơn mua ({locations.length} địa điểm)</span>
+                 <ArrowRight size={18} />
+               </button>
+             </div>
+@@ -796,15 +796,15 @@ export const BuyInsurance = ({ user }) => {
+           <div>
+             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.25rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+               <FileText size={22} />
+-              <span>Bước 4: Xác Nhận & Nộp Đơn Yêu Cầu Cấp Hợp Đồng</span>
++              <span>Bước 4: Xác nhận & gửi yêu cầu</span>
+             </h3>
+ 
+             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.75rem', padding: '1.5rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)' }}>
+               <div>
+-                <h4 style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', textTransform: 'uppercase', fontWeight: 700 }}>Bên Mua Bảo Hiểm</h4>
++                <h4 style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', textTransform: 'uppercase', fontWeight: 700 }}>Bên mua bảo hiểm</h4>
+                 {[
+-                  ['Tên Doanh nghiệp', insuredInfo.name],
+-                  ['Gmail nhận Hợp đồng', insuredInfo.email],
++                  ['Tên doanh nghiệp', insuredInfo.name],
++                  ['Email nhận hợp đồng', insuredInfo.email],
+                   ['Số điện thoại', insuredInfo.phone],
+                   ['Ngày hiệu lực', new Date(effectiveDateStr).toLocaleDateString('vi-VN')],
+                 ].map(([label, value]) => (
+@@ -815,7 +815,7 @@ export const BuyInsurance = ({ user }) => {
+               </div>
+               <div>
+                 <h4 style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', textTransform: 'uppercase', fontWeight: 700 }}>
+-                  Địa Điểm & Quyền Lợi ({locations.length} Cơ Sở)
++                  Địa điểm & quyền lợi ({locations.length} địa điểm)
+                 </h4>
+                 <div style={{ maxHeight: 110, overflowY: 'auto', marginBottom: '0.5rem', paddingRight: '0.25rem' }}>
+                   {locations.map((loc, idx) => (
+@@ -825,7 +825,7 @@ export const BuyInsurance = ({ user }) => {
+                   ))}
+                 </div>
+                 <p style={{ marginBottom: '0.35rem', fontSize: '0.875rem' }}>
+-                  <strong>Quyền lợi bảo hiểm:</strong> {selectedCoverages.filter((c) => c.selected).length} gói / địa điểm
++                  <strong>Quyền lợi:</strong> {selectedCoverages.filter((c) => c.selected).length} gói / địa điểm
+                 </p>
+                 <p style={{ marginBottom: '0.5rem', fontSize: '0.875rem' }}>
+                   <strong>Tổng phí ({locations.length} địa điểm): </strong>
+@@ -848,7 +848,7 @@ export const BuyInsurance = ({ user }) => {
+                 disabled={loading}
+               >
+                 <Bookmark size={18} style={{ color: 'var(--secondary)' }} />
+-                <span>Lưu Trạng Thái Bản Nháp (DRAFT)</span>
++                <span>Lưu bản nháp</span>
+               </button>
+               <button
+                 type="button"
+@@ -858,9 +858,9 @@ export const BuyInsurance = ({ user }) => {
+                 disabled={loading}
+               >
+                 {loading ? (
+-                  <><RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} /><span>Đang xử lý đơn...</span></>
++                  <><RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} /><span>Đang xử lý...</span></>
+                 ) : (
+-                  <><CheckCircle size={18} /><span>Nộp Đơn & Xuất Báo Giá (QUOTED)</span></>
++                  <><CheckCircle size={18} /><span>Nộp đơn & xuất báo giá</span></>
+                 )}
+               </button>
+             </div>
+diff --git a/frontend/src/pages/CustomerPortal.jsx b/frontend/src/pages/CustomerPortal.jsx
+index 689383a..4e1a86b 100644
+--- a/frontend/src/pages/CustomerPortal.jsx
++++ b/frontend/src/pages/CustomerPortal.jsx
+@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
+ import { Link } from 'react-router-dom';
+ import { FileText, Search, Plus, Filter, ShieldCheck, MapPin, DollarSign, Calendar, ArrowRight, RefreshCw, ChevronLeft, ChevronRight, XCircle, Download, Trash2, Zap, CreditCard } from 'lucide-react';
+ import StatusBadge from '../components/StatusBadge';
++import PageHeader from '../components/PageHeader';
+ import policyApi from '../api/policyApi';
+ import axiosClient from '../api/axiosClient';
+ 
+@@ -54,7 +55,7 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+         setPolicies(Array.isArray(res) ? res : []);
+       }
+     } catch (err) {
+-      console.error('Lỗi tải danh sách hợp đồng:', err);
++      console.error('Không tải được danh sách hợp đồng:', err);
+       setPolicies([]);
+     } finally {
+       setLoading(false);
+@@ -88,7 +89,7 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+       await policyApi.deletePolicy(policyNumber);
+       fetchPolicies();
+     } catch (err) {
+-      alert('Lỗi xóa hợp đồng: ' + err.message);
++      alert('Chưa xóa được hợp đồng: ' + err.message);
+     }
+   };
+ 
+@@ -103,61 +104,61 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+       link.click();
+       window.URL.revokeObjectURL(url);
+     } catch (err) {
+-      alert('Lỗi xuất Excel: ' + err.message);
++      alert('Không xuất được file Excel: ' + err.message);
+     }
+   };
+ 
+   const handleQuickAdminOfflineActive = async (policyNumber) => {
+-    if (!window.confirm(`⚡ [Admin] Bạn có chắc chắn muốn kích hoạt ngoại tuyến (ACTIVE) ngay lập tức cho hợp đồng ${policyNumber}? (Xác nhận đã thu phí trực tiếp)`)) return;
++    if (!window.confirm(`⚡ Bạn có chắc muốn kích hoạt ngay hợp đồng ${policyNumber}? (Xác nhận đã thu phí trực tiếp)`)) return;
+     try {
+       await policyApi.transitionStatus(policyNumber, {
+         targetStatus: 'ACTIVE',
+-        reason: 'Quản trị viên phê duyệt kích hoạt ngoại tuyến (Offline Payment Confirmed). Đã thu tiền mặt/đối ứng.',
+-        actor: user?.fullName || 'Quản trị viên (Admin)',
++        reason: 'Quản trị viên xác nhận đã thu phí trực tiếp và kích hoạt hợp đồng.',
++        actor: user?.fullName || 'Quản trị viên',
+       });
+-      alert(`⚡ Đã kích hoạt thành công hợp đồng ${policyNumber} sang trạng thái ACTIVE!`);
++      alert(`⚡ Đã kích hoạt thành công hợp đồng ${policyNumber}!`);
+       fetchPolicies();
+     } catch (err) {
+-      alert('Kích hoạt ngoại tuyến thất bại: ' + (err.message || 'Lỗi hệ thống'));
++      alert('Chưa kích hoạt được: ' + (err.message || 'Có lỗi xảy ra'));
+     }
+   };
+ 
+   const statusFilters = [
+-    { label: 'Tất cả trạng thái vòng đời', value: '' },
+-    { label: 'DRAFT - Đơn nháp', value: 'DRAFT' },
+-    { label: 'QUOTED - Đã báo phí', value: 'QUOTED' },
+-    { label: 'BOUND - Đã cam kết', value: 'BOUND' },
+-    { label: 'ACTIVE - Đang hiệu lực', value: 'ACTIVE' },
+-    { label: 'CANCELLED - Đã hủy đơn', value: 'CANCELLED' },
+-    { label: 'EXPIRED - Đã hết hạn', value: 'EXPIRED' },
++    { label: 'Tất cả trạng thái', value: '' },
++    { label: 'Bản nháp', value: 'DRAFT' },
++    { label: 'Đã báo giá', value: 'QUOTED' },
++    { label: 'Đã ký kết', value: 'BOUND' },
++    { label: 'Đang hiệu lực', value: 'ACTIVE' },
++    { label: 'Đã hủy', value: 'CANCELLED' },
++    { label: 'Đã hết hạn', value: 'EXPIRED' },
+   ];
+ 
+   return (
+     <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+-      {/* Header Banner */}
+-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+-        <div>
+-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)' }}>Sổ Tay Quản Lý Đơn Bảo Hiểm</h1>
+-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Tra cứu, theo dõi tiến độ cấp đơn, quy trình điều chỉnh phụ lục và trạng thái hợp đồng</p>
+-        </div>
+-        <Link to="/buy" className="btn btn-primary" style={{ padding: '0.75rem 1.25rem' }}>
+-          <Plus size={18} />
+-          <span>Yêu Cầu Cấp Đơn Mới</span>
+-        </Link>
+-      </div>
++      <PageHeader
++        title="Hợp đồng của tôi"
++        subtitle="Tra cứu và theo dõi hợp đồng, phụ lục bổ sung và trạng thái xử lý"
++        delay="v2-d1"
++        actions={
++          <Link to="/buy" className="btn" style={{ background: '#fff', color: 'var(--primary)', padding: '0.75rem 1.25rem', fontWeight: 700, borderRadius: 12, display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
++            <Plus size={18} />
++            <span>Tạo hợp đồng mới</span>
++          </Link>
++        }
++      />
+ 
+       {/* Advanced Search & Filter Bar */}
+-      <div className="card" style={{ marginBottom: '2rem', padding: '1.5rem' }}>
++      <div className="card v2-anim v2-d2" style={{ marginBottom: '2rem', padding: '1.5rem' }}>
+         <form onSubmit={handleSearchSubmit}>
+           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+             {/* Keyword Search */}
+             <div style={{ position: 'relative' }}>
+-              <label className="form-label">Mã Hợp đồng / Tên Bên mua</label>
++              <label className="form-label">Số hợp đồng / tên bên mua</label>
+               <div style={{ position: 'relative' }}>
+                 <input
+                   type="text"
+                   className="form-input"
+-                  placeholder="Nhập POL-... hoặc tên khách hàng"
++                  placeholder="Nhập số hợp đồng hoặc tên khách hàng, ví dụ: POL-2026-0042"
+                   value={search}
+                   onChange={(e) => setSearch(e.target.value)}
+                   style={{ paddingLeft: '2.5rem' }}
+@@ -168,7 +169,7 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+ 
+             {/* Status Filter */}
+             <div>
+-              <label className="form-label">Trạng thái Hợp đồng</label>
++              <label className="form-label">Trạng thái hợp đồng</label>
+               <select
+                 className="form-select"
+                 value={selectedStatus}
+@@ -182,11 +183,11 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+ 
+             {/* Min Premium */}
+             <div>
+-              <label className="form-label">Phí tối thiểu ($ USD)</label>
++              <label className="form-label">Phí tối thiểu (USD)</label>
+               <input
+                 type="number"
+                 className="form-input"
+-                placeholder="Từ $ USD"
++                placeholder="Từ"
+                 value={minPremium}
+                 onChange={(e) => setMinPremium(e.target.value)}
+               />
+@@ -194,11 +195,11 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+ 
+             {/* Max Premium */}
+             <div>
+-              <label className="form-label">Phí tối đa ($ USD)</label>
++              <label className="form-label">Phí tối đa (USD)</label>
+               <input
+                 type="number"
+                 className="form-input"
+-                placeholder="Đến $ USD"
++                placeholder="Đến"
+                 value={maxPremium}
+                 onChange={(e) => setMaxPremium(e.target.value)}
+               />
+@@ -217,7 +218,7 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+                 <option value="updatedAt">Ngày cập nhật</option>
+                 <option value="createdAt">Ngày khởi tạo</option>
+                 <option value="totalPremium">Tổng phí bảo hiểm</option>
+-                <option value="policyNumber">Mã số Hợp đồng</option>
++                <option value="policyNumber">Số hợp đồng</option>
+               </select>
+ 
+               <select
+@@ -238,7 +239,7 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+               </button>
+               <button type="submit" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.85rem' }}>
+                 <Filter size={16} />
+-                <span>Áp dụng Lọc</span>
++                <span>Áp dụng</span>
+               </button>
+             </div>
+           </div>
+@@ -248,7 +249,7 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+       {/* Result Count Banner */}
+       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+         <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+-          Hiển thị <strong>{policies.length}</strong> / <strong>{pageInfo.totalElements}</strong> hợp đồng bảo hiểm
++          Hiển thị <strong>{policies.length}</strong> / <strong>{pageInfo.totalElements}</strong> hợp đồng
+         </span>
+         <button onClick={fetchPolicies} className="btn btn-outline" style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}>
+           <RefreshCw size={14} />
+@@ -260,19 +261,19 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+       {loading ? (
+         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+           <RefreshCw size={28} style={{ animation: 'spin 1s linear infinite', marginBottom: '0.75rem' }} />
+-          <p>Đang truy vấn MongoDB Aggregation & Indexing...</p>
++          <p>Đang tải danh sách hợp đồng...</p>
+         </div>
+       ) : policies.length === 0 ? (
+         <div className="card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+           <FileText size={48} style={{ color: 'var(--text-light)', marginBottom: '1rem' }} />
+-          <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-muted)' }}>Không tìm thấy Đơn bảo hiểm thỏa điều kiện</h3>
+-          <p style={{ color: 'var(--text-light)', marginTop: '0.5rem', marginBottom: '1.5rem' }}>Vui lòng kiểm tra lại bộ lọc hoặc tạo một Yêu cầu Cấp đơn mới.</p>
+-          <Link to="/buy" className="btn btn-primary">Tạo Đơn Bảo Hiểm Ngay</Link>
++          <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-muted)' }}>Không tìm thấy hợp đồng nào phù hợp</h3>
++          <p style={{ color: 'var(--text-light)', marginTop: '0.5rem', marginBottom: '1.5rem' }}>Bạn thử nới lỏng điều kiện lọc, hoặc tạo hợp đồng mới.</p>
++          <Link to="/buy" className="btn btn-primary">Tạo hợp đồng mới</Link>
+         </div>
+       ) : (
+         <div className="grid-2">
+           {policies.map((p) => (
+-            <div key={p.id || p.policyNumber} className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', transition: 'all 0.2s ease-in-out' }}>
++            <div key={p.id || p.policyNumber} className="card v2-card-lift v2-anim" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+               <div>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                   <div>
+@@ -287,11 +288,11 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: '0.875rem', color: 'var(--text-main)', marginBottom: '1.25rem' }}>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                     <ShieldCheck size={16} style={{ color: 'var(--secondary)', shrink: 0 }} />
+-                    <span><strong>Bên mua BH:</strong> {p.insured?.name || 'N/A'} {p.insured?.email ? `(${p.insured.email})` : ''}</span>
++                    <span><strong>Bên mua:</strong> {p.insured?.name || 'N/A'} {p.insured?.email ? `(${p.insured.email})` : ''}</span>
+                   </div>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                     <MapPin size={16} style={{ color: 'var(--accent)', shrink: 0 }} />
+-                    <span><strong>Quy mô:</strong> {p.locations?.length || 0} Địa điểm bảo hiểm kê khai</span>
++                    <span><strong>Số địa điểm:</strong> {p.locations?.length || 0} địa điểm được bảo hiểm</span>
+                   </div>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                     <Calendar size={16} style={{ color: 'var(--text-muted)', shrink: 0 }} />
+@@ -302,7 +303,7 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+ 
+               <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                 <div>
+-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tổng phí bảo hiểm quy đổi</span>
++                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tổng phí (quy đổi)</span>
+                   <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary)' }}>
+                     ${p.totalPremium ? p.totalPremium.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'} USD
+                   </div>
+@@ -315,10 +316,10 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+                       onClick={() => handleQuickAdminOfflineActive(p.policyNumber)}
+                       className="btn btn-outline"
+                       style={{ fontSize: '0.8rem', padding: '0.4rem 0.75rem', borderColor: '#10b981', color: '#047857', backgroundColor: '#ecfdf5', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+-                      title="Kích hoạt ngoại tuyến ngay lập tức (Offline Approval)"
++                      title="Kích hoạt ngay (đã thu phí trực tiếp)"
+                     >
+                       <Zap size={14} />
+-                      <span>Kích Hoạt (Offline)</span>
++                      <span>Kích hoạt ngay</span>
+                     </button>
+                   )}
+ 
+@@ -327,10 +328,10 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+                       to={`/policies/${p.policyNumber}`}
+                       className="btn btn-primary"
+                       style={{ fontSize: '0.8rem', padding: '0.4rem 0.75rem', fontWeight: 700, backgroundColor: '#f59e0b', borderColor: '#d97706', color: 'white', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+-                      title="Xem thông tin chuyển khoản & Xác nhận thanh toán"
++                      title="Xem thông tin chuyển khoản và xác nhận thanh toán"
+                     >
+                       <CreditCard size={14} />
+-                      <span>Thanh Toán Phí</span>
++                      <span>Thanh toán phí</span>
+                     </Link>
+                   )}
+ 
+@@ -338,7 +339,7 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+                     onClick={() => handleDownloadExcel(p.policyNumber)}
+                     className="btn btn-outline"
+                     style={{ fontSize: '0.8rem', padding: '0.4rem 0.7rem' }}
+-                    title="Xuất Excel tính phí"
++                    title="Tải bảng phí (Excel)"
+                   >
+                     <Download size={14} />
+                   </button>
+@@ -348,7 +349,7 @@ export const CustomerPortal = ({ user, isAdmin }) => {
+                       onClick={() => handleDeletePolicy(p.policyNumber)}
+                       className="btn btn-outline"
+                       style={{ fontSize: '0.8rem', padding: '0.4rem 0.7rem', borderColor: '#fca5a5', color: '#dc2626' }}
+-                      title="Xóa hợp đồng (Admin)"
++                      title="Xóa hợp đồng"
+                     >
+                       <Trash2 size={14} />
+                     </button>
+diff --git a/frontend/src/pages/Login.jsx b/frontend/src/pages/Login.jsx
+index 5c2d24b..2f7e1a7 100644
+--- a/frontend/src/pages/Login.jsx
++++ b/frontend/src/pages/Login.jsx
+@@ -31,7 +31,7 @@ export const Login = ({ onLoginSuccess }) => {
+ 
+     const errorMsg = searchParams.get('error');
+     if (errorMsg) {
+-      alert('Đăng nhập thất bại: ' + decodeURIComponent(errorMsg));
++      alert('Không đăng nhập được: ' + decodeURIComponent(errorMsg));
+     }
+   }, [searchParams]);
+ 
+@@ -66,7 +66,7 @@ export const Login = ({ onLoginSuccess }) => {
+       onLoginSuccess(user, data.token);
+       navigate(data.role === 'ROLE_ADMIN' ? '/admin/reports' : '/my-policies');
+     } catch (err) {
+-      alert('Lỗi đăng nhập: ' + (err.message || 'Lỗi kết nối'));
++      alert('Không đăng nhập được: ' + (err.message || 'Lỗi kết nối'));
+     }
+   };
+ 
+@@ -89,7 +89,7 @@ export const Login = ({ onLoginSuccess }) => {
+       onLoginSuccess(user, data.token);
+       navigate(data.role === 'ROLE_ADMIN' ? '/admin/reports' : '/my-policies');
+     } catch (err) {
+-      alert('Lỗi đăng nhập nhanh: ' + (err.message || 'Lỗi kết nối'));
++      alert('Đăng nhập nhanh thất bại: ' + (err.message || 'Lỗi kết nối'));
+     } finally {
+       setQuickLoading(false);
+     }
+@@ -101,115 +101,149 @@ export const Login = ({ onLoginSuccess }) => {
+ 
+   return (
+     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh', padding: '1rem' }}>
+-      <div className="glass-card" style={{ maxWidth: 480, width: '100%' }}>
+-        <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
+-          <div className="user-avatar" style={{ margin: '0 auto 1rem', width: 64, height: 64, backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}>
+-            <ShieldCheck size={36} />
++      <div className="v2-login-wrap v2-anim">
++        {/* Brand panel */}
++        <div className="v2-login-brand">
++          <div className="v2-blob" style={{ width: 220, height: 220, background: '#6366f1', top: -40, right: -40 }} />
++          <div className="v2-blob" style={{ width: 180, height: 180, background: '#0d9488', bottom: -30, left: '10%', animationDelay: '-6s' }} />
++          <div style={{ position: 'relative', zIndex: 1 }}>
++            <div className="v2-float" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 14, padding: '0.7rem 1rem', marginBottom: '1.1rem', backdropFilter: 'blur(8px)' }}>
++              <ShieldCheck size={26} />
++              <b>InsurTech Policy</b>
++            </div>
++            <h2 style={{ fontSize: '1.65rem', fontWeight: 800, marginBottom: '0.7rem', lineHeight: 1.3, color: '#fff' }}>
++              Bảo hiểm thông minh<br />cho doanh nghiệp hiện đại
++            </h2>
++            <p style={{ color: '#dbeafe', fontSize: '0.92rem', maxWidth: 360 }}>
++              Báo giá tức thì · Ký số OTP · Theo dõi hợp đồng theo thời gian thực — tất cả trong một nền tảng.
++            </p>
++            <div className="v2-glass" style={{ marginTop: '1.4rem', borderRadius: 14, padding: '0.9rem 1.1rem', display: 'flex', gap: '1rem', alignItems: 'center', maxWidth: 380 }}>
++              <div className="user-avatar" style={{ width: 42, height: 42, flexShrink: 0, background: 'var(--secondary)', fontSize: '1.1rem' }}>✓</div>
++              <div style={{ fontSize: '0.82rem', color: '#fff' }}>
++                <b>12.400+ hợp đồng</b> đang được quản lý<br />
++                <span style={{ color: '#dbeafe' }}>Vận hành ổn định 99,98% trong 12 tháng</span>
++              </div>
++            </div>
++          </div>
++          <div className="v2-marquee" style={{ position: 'relative', zIndex: 1, marginTop: '2rem' }}>
++            <div className="v2-marquee-track" style={{ color: '#bfdbfe', fontSize: '0.82rem', fontWeight: 700 }}>
++              <span>✦ BỒI THƯỜNG 24/7</span><span>✦ PHÍ MINH BẠCH</span><span>✦ KÝ SỐ OTP</span><span>✦ DÀNH CHO DOANH NGHIỆP</span>
++              <span>✦ BỒI THƯỜNG 24/7</span><span>✦ PHÍ MINH BẠCH</span><span>✦ KÝ SỐ OTP</span><span>✦ DÀNH CHO DOANH NGHIỆP</span>
++            </div>
+           </div>
+-          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)' }}>Đăng Nhập Cổng Bảo Hiểm</h2>
+-          <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
+-            Hệ thống Quản lý & Cấp Đơn Bảo hiểm Doanh nghiệp InsurTech
+-          </p>
+         </div>
+ 
+-        {/* Google OAuth2 Direct Button */}
+-        <button
+-          type="button"
+-          onClick={handleGoogleOAuth2Login}
+-          className="btn btn-outline"
+-          style={{
+-            width: '100%',
+-            padding: '0.8rem',
+-            marginBottom: '1rem',
+-            display: 'flex',
+-            alignItems: 'center',
+-            justifyContent: 'center',
+-            gap: '0.75rem',
+-            fontWeight: 700,
+-            borderColor: '#4285F4',
+-            color: '#1a73e8'
+-          }}
+-        >
+-          <Globe size={20} style={{ color: '#4285F4' }} />
+-          <span>Đăng nhập trực tiếp bằng Google OAuth2</span>
+-        </button>
+-
+-        {/* QA/Tester Quick Role Switchers */}
+-        <div style={{
+-          backgroundColor: 'var(--bg-main)',
+-          padding: '1rem',
+-          borderRadius: 'var(--radius-md)',
+-          marginBottom: '1.5rem',
+-          border: '1px dashed var(--border)'
+-        }}>
+-          <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.6rem', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+-            <KeyRound size={14} />
+-            <span>Chế độ Tester / Phân Quyền Kiểm Thử Nhanh (QA)</span>
+-          </div>
+-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
+-            <button
+-              type="button"
+-              disabled={quickLoading}
+-              onClick={() => handleQuickLogin('admin@insurtech.vn', 'ROLE_ADMIN', 'Quản Trị Viên (Admin)')}
+-              className="btn btn-primary"
+-              style={{ fontSize: '0.82rem', padding: '0.55rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', backgroundColor: '#e11d48', borderColor: '#e11d48' }}
+-            >
+-              <ShieldCheck size={15} />
+-              <span>Login ADMIN</span>
+-            </button>
+-            <button
+-              type="button"
+-              disabled={quickLoading}
+-              onClick={() => handleQuickLogin('khachhang@gmail.com', 'ROLE_USER', 'Khách Hàng (User)')}
+-              className="btn btn-outline"
+-              style={{ fontSize: '0.82rem', padding: '0.55rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+-            >
+-              <UserCheck size={15} />
+-              <span>Login USER</span>
+-            </button>
++        {/* Login form */}
++        <div className="glass-card v2-login-form">
++          <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
++            <div className="user-avatar" style={{ margin: '0 auto 1rem', width: 64, height: 64, backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}>
++              <ShieldCheck size={36} />
++            </div>
++            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)' }}>Đăng nhập</h2>
++            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
++              Nền tảng quản lý hợp đồng bảo hiểm doanh nghiệp
++            </p>
+           </div>
+-        </div>
+ 
+-        <div style={{ display: 'flex', alignItems: 'center', margin: '1rem 0', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+-          <div style={{ flex: 1, height: 1, backgroundColor: 'var(--border)' }} />
+-          <span style={{ padding: '0 0.75rem' }}>HOẶC ĐĂNG NHẬP BẰNG GMAIL & OTP</span>
+-          <div style={{ flex: 1, height: 1, backgroundColor: 'var(--border)' }} />
+-        </div>
++          {/* Google OAuth2 Direct Button */}
++          <button
++            type="button"
++            onClick={handleGoogleOAuth2Login}
++            className="btn btn-outline"
++            style={{
++              width: '100%',
++              padding: '0.8rem',
++              marginBottom: '1rem',
++              display: 'flex',
++              alignItems: 'center',
++              justifyContent: 'center',
++              gap: '0.75rem',
++              fontWeight: 700,
++              borderColor: '#4285F4',
++              color: '#1a73e8'
++            }}
++          >
++            <Globe size={20} style={{ color: '#4285F4' }} />
++            <span>Đăng nhập bằng Google</span>
++          </button>
+ 
+-        {/* OTP Email Form */}
+-        <form onSubmit={handleSendOtp}>
+-          <div className="form-group">
+-            <label className="form-label">Địa chỉ Gmail</label>
+-            <div style={{ position: 'relative' }}>
+-              <input
+-                type="email"
+-                className="form-input"
+-                placeholder="vd: dungphdse@gmail.com hoặc user@gmail.com"
+-                value={email}
+-                onChange={(e) => setEmail(e.target.value)}
+-                style={{ paddingLeft: '2.5rem' }}
+-                required
+-              />
+-              <Mail size={18} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light)' }} />
++          {/* Quick Role Switchers (demo) */}
++          <div style={{
++            backgroundColor: 'var(--bg-main)',
++            padding: '1rem',
++            borderRadius: 'var(--radius-md)',
++            marginBottom: '1.5rem',
++            border: '1px dashed var(--border)'
++          }}>
++            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.6rem', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
++              <KeyRound size={14} />
++              <span>Đăng nhập nhanh (bản dùng thử)</span>
++            </div>
++            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
++              <button
++                type="button"
++                disabled={quickLoading}
++                onClick={() => handleQuickLogin('admin@insurtech.vn', 'ROLE_ADMIN', 'Quản trị viên')}
++                className="btn btn-primary"
++                style={{ fontSize: '0.82rem', padding: '0.55rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', backgroundColor: '#e11d48', borderColor: '#e11d48' }}
++              >
++                <ShieldCheck size={15} />
++                <span>Đăng nhập Admin</span>
++              </button>
++              <button
++                type="button"
++                disabled={quickLoading}
++                onClick={() => handleQuickLogin('khachhang@gmail.com', 'ROLE_USER', 'Khách hàng')}
++                className="btn btn-outline"
++                style={{ fontSize: '0.82rem', padding: '0.55rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
++              >
++                <UserCheck size={15} />
++                <span>Đăng nhập User</span>
++              </button>
+             </div>
+-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
+-              * Email thuộc <code>dungphdse@gmail.com</code> hoặc <code>admin@insurtech.vn</code> sẽ tự động nhận vai trò ADMIN.
+-            </span>
+           </div>
+ 
+-          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem', padding: '0.75rem' }} disabled={loading}>
+-            {loading ? 'Đang gửi mã OTP...' : (
+-              <>
+-                <span>Tiếp tục nhận OTP qua Mail</span>
+-                <ArrowRight size={18} />
+-              </>
+-            )}
+-          </button>
+-        </form>
++          <div style={{ display: 'flex', alignItems: 'center', margin: '1rem 0', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
++            <div style={{ flex: 1, height: 1, backgroundColor: 'var(--border)' }} />
++            <span style={{ padding: '0 0.75rem' }}>Hoặc đăng nhập bằng Gmail</span>
++            <div style={{ flex: 1, height: 1, backgroundColor: 'var(--border)' }} />
++          </div>
+ 
+-        <div style={{ marginTop: '1.5rem', padding: '0.85rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)', fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', gap: '0.5rem' }}>
+-          <Lock size={16} style={{ shrink: 0, marginTop: '2px', color: 'var(--secondary)' }} />
+-          <span>Hệ thống phân quyền RBAC & mã hoá JWT 256-bit chuẩn Spring Security.</span>
++          {/* OTP Email Form */}
++          <form onSubmit={handleSendOtp}>
++            <div className="form-group">
++              <label className="form-label">Email</label>
++              <div style={{ position: 'relative' }}>
++                <input
++                  type="email"
++                  className="form-input"
++                  placeholder="vd: dungphdse@gmail.com hoặc user@gmail.com"
++                  value={email}
++                  onChange={(e) => setEmail(e.target.value)}
++                  style={{ paddingLeft: '2.5rem' }}
++                  required
++                />
++                <Mail size={18} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light)' }} />
++              </div>
++              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
++                * Email thuộc <code>dungphdse@gmail.com</code> hoặc <code>admin@insurtech.vn</code> sẽ được gán quyền quản trị viên.
++              </span>
++            </div>
++
++            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem', padding: '0.75rem' }} disabled={loading}>
++              {loading ? 'Đang gửi mã OTP...' : (
++                <>
++                  <span>Nhận mã OTP</span>
++                  <ArrowRight size={18} />
++                </>
++              )}
++            </button>
++          </form>
++
++          <div style={{ marginTop: '1.5rem', padding: '0.85rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)', fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', gap: '0.5rem' }}>
++            <Lock size={16} style={{ shrink: 0, marginTop: '2px', color: 'var(--secondary)' }} />
++            <span>Bảo mật đa lớp, đăng nhập an toàn bằng OTP.</span>
++          </div>
+         </div>
+       </div>
+ 
+diff --git a/frontend/src/pages/PolicyDetail.jsx b/frontend/src/pages/PolicyDetail.jsx
+index cb3ccc9..f810fcf 100644
+--- a/frontend/src/pages/PolicyDetail.jsx
++++ b/frontend/src/pages/PolicyDetail.jsx
+@@ -58,7 +58,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+   const [endorseLimit, setEndorseLimit] = useState(1000000);
+   const [endorseDeductible, setEndorseDeductible] = useState(5000);
+   const [endorsePremium, setEndorsePremium] = useState(800);
+-  const [endorseDescription, setEndorseDescription] = useState('Bổ sung quyền lợi bảo hiểm Cyber Liability theo yêu cầu khách hàng');
++  const [endorseDescription, setEndorseDescription] = useState('Bổ sung gói an ninh mạng theo yêu cầu khách hàng');
+ 
+   const coveragePresets = [
+     { code: 'CYBER', name: 'Bảo hiểm An ninh mạng (Cyber Liability)', limit: 1000000, deductible: 5000, premium: 800 },
+@@ -86,8 +86,8 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+         setEndorseLocId(data.locations[0].locationId);
+       }
+     } catch (err) {
+-      console.error('Không thể nạp chi tiết hợp đồng', err);
+-      setMessage({ type: 'error', text: err.message || 'Không tìm thấy hợp đồng bảo hiểm trên server' });
++      console.error('Không tải được chi tiết hợp đồng', err);
++      setMessage({ type: 'error', text: err.message || 'Không tìm thấy hợp đồng này' });
+     } finally {
+       setLoading(false);
+     }
+@@ -131,20 +131,20 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+       const updated = await policyApi.transitionStatus(policyNumber, {
+         targetStatus,
+         reason,
+-        actor: user?.fullName || user?.email || (isAdmin ? 'Chuyên viên Bảo Hiểm' : 'Khách hàng'),
++        actor: user?.fullName || user?.email || (isAdmin ? 'Chuyên viên bảo hiểm' : 'Khách hàng'),
+       });
+       setPolicy(updated);
+       setMessage({ type: 'success', text: `Đã chuyển thành công trạng thái hợp đồng sang ${targetStatus}` });
+       fetchHistory();
+     } catch (err) {
+-      setMessage({ type: 'error', text: err.message || 'Chuyển trạng thái thất bại' });
++      setMessage({ type: 'error', text: err.message || 'Chưa chuyển được trạng thái, bạn thử lại nhé' });
+     }
+   };
+ 
+   // Dedicated Handler: QUOTED -> BOUND (Proposal Binding & Payment Due Setting)
+   const handleConfirmBind = async (asSimulatedAdmin = false) => {
+     if (!agreeTerms && !isAdmin && !asSimulatedAdmin) {
+-      alert('Vui lòng tích chọn xác nhận cam kết điều khoản giao kết bảo hiểm.');
++      alert('Bạn tích chọn để xác nhận đồng ý với điều khoản hợp đồng nhé.');
+       return;
+     }
+ 
+@@ -159,14 +159,14 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+ 
+     try {
+       const actorLabel = isAdmin
+-        ? 'Quản trị viên (Admin)'
+-        : (asSimulatedAdmin ? 'Quản trị viên (Phê duyệt đề xuất của Khách hàng)' : (user?.fullName || user?.email || 'Khách hàng (User)'));
++        ? 'Quản trị viên'
++        : (asSimulatedAdmin ? 'Quản trị viên (duyệt đề xuất của khách hàng)' : (user?.fullName || user?.email || 'Khách hàng'));
+ 
+       const reasonLabel = isAdmin
+-        ? `Quản trị viên thiết lập hạn chót thanh toán phí đến ngày ${new Date(targetDueDate).toLocaleDateString('vi-VN')} và chuyển sang BOUND.`
++        ? `Quản trị viên ấn định hạn nộp phí đến ngày ${new Date(targetDueDate).toLocaleDateString('vi-VN')}. Hợp đồng chuyển sang trạng thái Đã ký kết.`
+         : (asSimulatedAdmin
+-            ? `Admin đã phê duyệt đề xuất hạn thanh toán của khách hàng (${bindDueDays} ngày - đến ${new Date(targetDueDate).toLocaleDateString('vi-VN')}). Hợp đồng chuyển sang BOUND.`
+-            : `Khách hàng chấp thuận bảng phí và đề xuất hạn thanh toán đến ngày ${new Date(targetDueDate).toLocaleDateString('vi-VN')}.`);
++            ? `Quản trị viên đã duyệt đề xuất hạn nộp phí của khách hàng (${bindDueDays} ngày - đến ${new Date(targetDueDate).toLocaleDateString('vi-VN')}). Hợp đồng chuyển sang Đã ký kết.`
++            : `Khách hàng đồng ý bảng phí và đề xuất hạn nộp phí đến ngày ${new Date(targetDueDate).toLocaleDateString('vi-VN')}.`);
+ 
+       const updated = await policyApi.transitionStatus(policyNumber, {
+         targetStatus: 'BOUND',
+@@ -179,11 +179,11 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+       setIsBindModalOpen(false);
+       setMessage({
+         type: 'success',
+-        text: `✅ Hợp đồng đã chuyển sang trạng thái BOUND! Hạn chót thanh toán: ${new Date(targetDueDate).toLocaleDateString('vi-VN')}.`
++        text: `✅ Hợp đồng đã chuyển sang trạng thái Đã ký kết! Hạn nộp phí: ${new Date(targetDueDate).toLocaleDateString('vi-VN')}.`
+       });
+       fetchHistory();
+     } catch (err) {
+-      setMessage({ type: 'error', text: err.message || 'Chuyển trạng thái thất bại' });
++      setMessage({ type: 'error', text: err.message || 'Chưa chuyển được trạng thái, bạn thử lại nhé' });
+     }
+   };
+ 
+@@ -192,15 +192,15 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+     try {
+       const updated = await policyApi.transitionStatus(policyNumber, {
+         targetStatus: 'ACTIVE',
+-        reason: 'Quản trị viên phê duyệt kích hoạt ngoại tuyến (Offline Payment Confirmed). Đã thu phí trực tiếp/đối ứng.',
+-        actor: user?.fullName || 'Quản trị viên (Admin)',
++        reason: 'Quản trị viên xác nhận đã thu phí trực tiếp và kích hoạt hợp đồng.',
++        actor: user?.fullName || 'Quản trị viên',
+       });
+       setPolicy(updated);
+       setIsAdminOfflineConfirmOpen(false);
+-      setMessage({ type: 'success', text: '⚡ Admin đã kích hoạt thành công hợp đồng sang trạng thái ACTIVE (Ngoại tuyến)!' });
++      setMessage({ type: 'success', text: '⚡ Đã kích hoạt thành công hợp đồng (ngoại tuyến)!' });
+       fetchHistory();
+     } catch (err) {
+-      setMessage({ type: 'error', text: err.message || 'Kích hoạt ngoại tuyến thất bại' });
++      setMessage({ type: 'error', text: err.message || 'Chưa kích hoạt được, bạn thử lại nhé' });
+     }
+   };
+ 
+@@ -209,8 +209,8 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+     setIsPayingSimulation(true);
+     try {
+       await new Promise((res) => setTimeout(res, 800)); // simulate banking gateway verification
+-      const actorLabel = isAdmin ? 'Kế toán / Quản trị viên (Admin)' : (user?.fullName || user?.email || 'Khách hàng (User)');
+-      const methodLabel = paymentMethod === 'BANK_TRANSFER' ? 'Chuyển khoản Ngân hàng (Vietcombank)' : 'Thẻ Tín dụng Doanh nghiệp';
++      const actorLabel = isAdmin ? 'Kế toán / Quản trị viên' : (user?.fullName || user?.email || 'Khách hàng');
++      const methodLabel = paymentMethod === 'BANK_TRANSFER' ? 'Chuyển khoản ngân hàng' : 'Thẻ tín dụng';
+       const updated = await policyApi.transitionStatus(policyNumber, {
+         targetStatus: 'ACTIVE',
+         reason: `Xác nhận thanh toán phí bảo hiểm thành công qua ${methodLabel}. Mã giao dịch: ${paymentRef}. Kích hoạt hiệu lực hợp đồng.`,
+@@ -218,10 +218,10 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+       });
+       setPolicy(updated);
+       setIsPayActiveModalOpen(false);
+-      setMessage({ type: 'success', text: `🎉 Thanh toán thành công $${policy.totalPremium?.toLocaleString()} USD! Hợp đồng ${policyNumber} đã chính thức ACTIVE (Có hiệu lực bảo vệ)!` });
++      setMessage({ type: 'success', text: `🎉 Thanh toán thành công $${policy.totalPremium?.toLocaleString()} USD! Hợp đồng ${policyNumber} đã chính thức có hiệu lực!` });
+       fetchHistory();
+     } catch (err) {
+-      setMessage({ type: 'error', text: err.message || 'Kích hoạt hợp đồng thất bại' });
++      setMessage({ type: 'error', text: err.message || 'Chưa kích hoạt được, bạn thử lại nhé' });
+     } finally {
+       setIsPayingSimulation(false);
+     }
+@@ -242,20 +242,20 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+       setPolicy(updated);
+       setIsAddLocOpen(false);
+       setNewLocAddress('');
+-      setMessage({ type: 'success', text: `Đã bổ sung Địa điểm mới ${newLocId} thành công vào MongoDB` });
++      setMessage({ type: 'success', text: `Đã thêm địa điểm ${newLocId}` });
+     } catch (err) {
+-      setMessage({ type: 'error', text: err.message || 'Lỗi thêm địa điểm' });
++      setMessage({ type: 'error', text: err.message || 'Chưa thêm được địa điểm, bạn thử lại nhé' });
+     }
+   };
+ 
+   const handleRemoveLocation = async (locationId) => {
+-    if (!window.confirm(`Bạn có chắc chắn muốn xóa Địa điểm ${locationId} khỏi Hợp đồng?`)) return;
++    if (!window.confirm(`Bạn có chắc muốn xóa địa điểm ${locationId} khỏi hợp đồng?`)) return;
+     try {
+       const updated = await policyApi.removeLocation(policyNumber, locationId);
+       setPolicy(updated);
+-      setMessage({ type: 'success', text: `Đã xóa Địa điểm ${locationId} thành công` });
++      setMessage({ type: 'success', text: `Đã xóa địa điểm ${locationId}` });
+     } catch (err) {
+-      setMessage({ type: 'error', text: err.message || 'Lỗi xóa địa điểm' });
++      setMessage({ type: 'error', text: err.message || 'Chưa xóa được địa điểm, bạn thử lại nhé' });
+     }
+   };
+ 
+@@ -271,9 +271,9 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+       const updated = await policyApi.addCoverage(policyNumber, targetLocId, newCovData);
+       setPolicy(updated);
+       setIsAddCovOpen(false);
+-      setMessage({ type: 'success', text: `Đã thêm gói quyền lợi ${newCovData.coverageCode} vào Địa điểm ${targetLocId}` });
++      setMessage({ type: 'success', text: `Đã thêm gói ${newCovData.coverageCode} vào địa điểm ${targetLocId}` });
+     } catch (err) {
+-      setMessage({ type: 'error', text: err.message || 'Lỗi thêm gói bảo hiểm' });
++      setMessage({ type: 'error', text: err.message || 'Chưa thêm được gói bảo hiểm, bạn thử lại nhé' });
+     }
+   };
+ 
+@@ -282,9 +282,9 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+     try {
+       const updated = await policyApi.removeCoverage(policyNumber, locationId, coverageCode);
+       setPolicy(updated);
+-      setMessage({ type: 'success', text: `Đã loại bỏ gói ${coverageCode} thành công` });
++      setMessage({ type: 'success', text: `Đã bỏ gói ${coverageCode}` });
+     } catch (err) {
+-      setMessage({ type: 'error', text: err.message || 'Lỗi xóa gói quyền lợi' });
++      setMessage({ type: 'error', text: err.message || 'Chưa xóa được gói quyền lợi, bạn thử lại nhé' });
+     }
+   };
+ 
+@@ -292,7 +292,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+   const handleEndorsementSubmit = async (e) => {
+     e.preventDefault();
+     if (!endorseDescription.trim()) {
+-      alert('Vui lòng nhập mô tả chi tiết nội dung đợt Endorsement');
++      alert('Bạn mô tả ngắn gọn nội dung đợt điều chỉnh nhé');
+       return;
+     }
+ 
+@@ -300,7 +300,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+       const payload = {
+         endorsementType: endorseType,
+         changeDescription: endorseDescription.trim(),
+-        actor: user?.fullName || user?.email || (isAdmin ? 'Chuyên viên Bảo hiểm' : 'Khách hàng'),
++        actor: user?.fullName || user?.email || (isAdmin ? 'Chuyên viên bảo hiểm' : 'Khách hàng'),
+         locationId: endorseLocId || policy.locations?.[0]?.locationId,
+       };
+ 
+@@ -322,7 +322,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+       setPolicy(updated);
+       setMessage({
+         type: 'success',
+-        text: `Thực thi Endorsement thành công! Đã tạo Snapshot V${updated.version - 1}, nâng cấp Hợp đồng lên V${updated.version}, cập nhật Tổng phí mới $${updated.totalPremium?.toLocaleString()} USD`
++        text: `Đã lưu đợt điều chỉnh! Hợp đồng lên V${updated.version}, tổng phí mới $${updated.totalPremium?.toLocaleString()} USD`
+       });
+ 
+       // Update available versions
+@@ -333,7 +333,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+ 
+       fetchHistory();
+     } catch (err) {
+-      setMessage({ type: 'error', text: err.message || 'Thực thi Endorsement thất bại' });
++      setMessage({ type: 'error', text: err.message || 'Chưa lưu được đợt điều chỉnh, bạn thử lại nhé' });
+     }
+   };
+ 
+@@ -348,31 +348,31 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+       link.click();
+       window.URL.revokeObjectURL(url);
+     } catch (err) {
+-      alert('Lỗi tải file Excel: ' + (err.message || 'Lỗi server'));
++      alert('Không tải được file Excel: ' + (err.message || 'Lỗi hệ thống, bạn thử lại sau nhé'));
+     }
+   };
+ 
+   if (loading) return (
+     <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+       <RefreshCw size={32} style={{ animation: 'spin 1s linear infinite', marginBottom: '1rem' }} />
+-      <p>Đang tải chi tiết Đơn bảo hiểm {policyNumber}...</p>
++      <p>Đang tải chi tiết hợp đồng {policyNumber}...</p>
+     </div>
+   );
+ 
+   if (!policy) return (
+     <div style={{ textAlign: 'center', padding: '4rem' }}>
+       <AlertTriangle size={48} style={{ color: 'var(--accent)', marginBottom: '1rem' }} />
+-      <h3>Không tìm thấy dữ liệu Đơn bảo hiểm {policyNumber}</h3>
+-      <Link to="/my-policies" className="btn btn-primary" style={{ marginTop: '1rem' }}>Quay lại danh sách</Link>
++      <h3>Không tìm thấy hợp đồng {policyNumber}</h3>
++      <Link to="/my-policies" className="btn btn-primary" style={{ marginTop: '1rem' }}>Về danh sách hợp đồng</Link>
+     </div>
+   );
+ 
+   const lifecycleStages = [
+-    { key: 'DRAFT', label: '1. DRAFT', desc: 'Đang tạo, chỉnh sửa' },
+-    { key: 'QUOTED', label: '2. QUOTED', desc: 'Đã báo phí' },
+-    { key: 'BOUND', label: '3. BOUND', desc: 'Hai bên cam kết' },
+-    { key: 'ACTIVE', label: '4. ACTIVE', desc: 'Có hiệu lực' },
+-    { key: 'CANCELLED', label: '5. CANCELLED / EXPIRED', desc: 'Chấm dứt/Hết hạn' },
++    { key: 'DRAFT', label: '1. Nháp', desc: 'Đang tạo, chỉnh sửa' },
++    { key: 'QUOTED', label: '2. Đã báo giá', desc: 'Đã báo giá' },
++    { key: 'BOUND', label: '3. Đã ký kết', desc: 'Hai bên cam kết' },
++    { key: 'ACTIVE', label: '4. Đang hiệu lực', desc: 'Đang hiệu lực' },
++    { key: 'CANCELLED', label: '5. Kết thúc', desc: 'Đã hủy / Hết hạn' },
+   ];
+ 
+   const getStageIndex = (status) => {
+@@ -395,31 +395,31 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+         <Link to="/my-policies" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+           <ArrowLeft size={18} />
+-          <span>Quay lại Danh sách Đơn bảo hiểm</span>
++          <span>← Về danh sách hợp đồng</span>
+         </Link>
+         <div style={{ display: 'flex', gap: '0.5rem' }}>
+           <button onClick={handleDownloadExcel} className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+             <Download size={14} />
+-            <span>Xuất Bảng Phí Excel (.xlsx)</span>
++            <span>Tải bảng phí (Excel)</span>
+           </button>
+           <button onClick={fetchPolicyDetail} className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+             <RefreshCw size={14} />
+-            <span>Làm mới</span>
++            <span>Tải lại</span>
+           </button>
+         </div>
+       </div>
+ 
+       {/* Main Policy Header Banner */}
+-      <div className="card" style={{ marginBottom: '1.5rem', padding: '1.75rem' }}>
++      <div className="card v2-anim v2-d1" style={{ marginBottom: '1.5rem', padding: '1.75rem', position: 'relative', overflow: 'hidden' }}>
+         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+           <div>
+             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>
+               <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--primary)', margin: 0 }}>{policy.policyNumber}</h1>
+               <span className="brand-badge" style={{ fontSize: '0.85rem', backgroundColor: 'var(--primary)', color: 'white' }}>
+-                CURRENT STATE V{policy.version}
++                Phiên bản hiện tại V{policy.version}
+               </span>
+               <span style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', borderRadius: '4px', backgroundColor: '#f1f5f9', fontWeight: 700, color: '#475569' }}>
+-                {policy.insured?.type === 'BUSINESS' ? 'DOANH NGHIỆP (BUSINESS)' : 'CÁ NHÂN (INDIVIDUAL)'}
++                {policy.insured?.type === 'BUSINESS' ? 'Doanh nghiệp' : 'Cá nhân'}
+               </span>
+             </div>
+             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', margin: '0.3rem 0 0' }}>
+@@ -431,7 +431,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+             <StatusBadge status={policy.status} />
+             <div style={{ textAlign: 'right' }}>
+               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+-                Total Premium = SUM(Coverages)
++                Tổng phí
+               </span>
+               <div style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--primary)', lineHeight: 1.1 }}>
+                 ${policy.totalPremium ? policy.totalPremium.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'} USD
+@@ -450,7 +450,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+ 
+               return (
+                 <div key={st.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, zIndex: 1, textAlign: 'center' }}>
+-                  <div style={{
++                  <div className={isCurrent ? 'v2-step-dot-active' : ''} style={{
+                     width: 36,
+                     height: 36,
+                     borderRadius: '50%',
+@@ -504,11 +504,11 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+       {/* Tabs Navigation Header */}
+       <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: '1.5rem', gap: '0.5rem', overflowX: 'auto' }}>
+         {[
+-          { id: 'overview', label: '1. Vòng Đời & Nghiệp Vụ', icon: ShieldCheck },
++          { id: 'overview', label: '1. Tổng quan', icon: ShieldCheck },
+           { id: 'location_manage', label: '2. Địa Điểm & Quyền Lợi', icon: MapPin },
+-          { id: 'endorsement', label: '3. Điều Chỉnh Endorsement', icon: FileDiff },
+-          { id: 'history', label: '4. Vết Giao Dịch Audit Trail', icon: History },
+-          { id: 'versions', label: '5. Tra Cứu Snapshot Vers', icon: Layers },
++          { id: 'endorsement', label: '3. Điều chỉnh phụ lục', icon: FileDiff },
++          { id: 'history', label: '4. Nhật ký thay đổi', icon: History },
++          { id: 'versions', label: '5. Các phiên bản đã lưu', icon: Layers },
+         ].map((tab) => {
+           const Icon = tab.icon;
+           return (
+@@ -541,18 +541,18 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+           {/* Insured Profile Card */}
+           <div className="card">
+             <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1rem', color: 'var(--primary)' }}>
+-              1. Thông Tin Đối Tượng Bảo Hiểm (Insured)
++              1. Thông tin bên mua bảo hiểm
+             </h3>
+             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem' }}>
+-              <p><strong>Mã Insured ID:</strong> <span className="brand-badge">{policy.insured?.insuredId || 'INS-001'}</span></p>
+-              <p><strong>Loại đối tượng:</strong> {policy.insured?.type === 'BUSINESS' ? 'Doanh nghiệp (BUSINESS)' : 'Cá nhân (INDIVIDUAL)'}</p>
+-              <p><strong>Tên Bên mua:</strong> {policy.insured?.name}</p>
+-              <p><strong>Gmail nhận hợp đồng:</strong> {policy.insured?.email}</p>
++              <p><strong>Mã định danh:</strong> <span className="brand-badge">{policy.insured?.insuredId || 'INS-001'}</span></p>
++              <p><strong>Đối tượng:</strong> {policy.insured?.type === 'BUSINESS' ? 'Doanh nghiệp' : 'Cá nhân'}</p>
++              <p><strong>Bên mua:</strong> {policy.insured?.name}</p>
++              <p><strong>Email nhận hợp đồng:</strong> {policy.insured?.email}</p>
+               <p><strong>Số điện thoại:</strong> {policy.insured?.phone || 'Chưa cập nhật'}</p>
+-              <p><strong>Địa chỉ trụ sở:</strong> {policy.insured?.address || 'Chưa cập nhật'}</p>
++              <p><strong>Địa chỉ:</strong> {policy.insured?.address || 'Chưa cập nhật'}</p>
+               <p style={{ marginTop: '0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+-                Ngày bắt đầu hiệu lực: <strong>{policy.effectiveDate ? new Date(policy.effectiveDate).toLocaleDateString('vi-VN') : 'N/A'}</strong><br />
+-                Ngày kết thúc bảo hiểm: <strong>{policy.expirationDate ? new Date(policy.expirationDate).toLocaleDateString('vi-VN') : 'N/A'}</strong>
++                Ngày hiệu lực: <strong>{policy.effectiveDate ? new Date(policy.effectiveDate).toLocaleDateString('vi-VN') : 'N/A'}</strong><br />
++                Ngày hết hạn: <strong>{policy.expirationDate ? new Date(policy.expirationDate).toLocaleDateString('vi-VN') : 'N/A'}</strong>
+               </p>
+             </div>
+           </div>
+@@ -560,10 +560,10 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+           {/* State Machine Transition Engine */}
+           <div className="card">
+             <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '0.75rem', color: 'var(--primary)' }}>
+-              2. Chuyển Đổi Vòng Đời Hợp Đồng (P06 State Machine)
++              2. Chuyển trạng thái hợp đồng
+             </h3>
+             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
+-              Trạng thái hiện thời: <StatusBadge status={policy.status} /> (Không được tự do PUT đổi status, phải qua endpoint chuyển đổi có kiểm tra tính hợp lệ).
++              Trạng thái hiện tại: <StatusBadge status={policy.status} />
+             </p>
+ 
+             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+@@ -571,11 +571,11 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                 <div>
+                   <div style={{ padding: '0.65rem 0.85rem', backgroundColor: 'var(--primary-light)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', fontSize: '0.82rem', color: 'var(--primary)', marginBottom: '0.65rem' }}>
+                     <Info size={15} style={{ display: 'inline', marginRight: 6 }} />
+-                    <strong>Giai đoạn Soạn thảo (DRAFT):</strong> Hợp đồng đang tạo hoặc lưu nháp. Khách hàng hoặc Chuyên viên có thể bấm nút bên dưới để chốt định phí chính thức.
++                    <strong>Soạn thảo:</strong> Hợp đồng đang ở dạng nháp. Bạn bấm nút bên dưới để chốt phí chính thức.
+                   </div>
+-                  <button onClick={() => handleStatusTransition('QUOTED', 'Tính toán định phí bảo hiểm chính thức cho đơn nháp')} className="btn btn-primary" style={{ width: '100%', padding: '0.8rem' }}>
++                  <button onClick={() => handleStatusTransition('QUOTED', 'Tính phí chính thức cho bản nháp')} className="btn btn-primary" style={{ width: '100%', padding: '0.8rem' }}>
+                     <Play size={16} />
+-                    <span>Bước 2: Phê Duyệt Báo Phí (DRAFT ➔ QUOTED)</span>
++                    <span>Bước 2: Duyệt báo giá</span>
+                   </button>
+                 </div>
+               )}
+@@ -584,11 +584,11 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                 <div>
+                   <div style={{ padding: '0.65rem 0.85rem', backgroundColor: '#eff6ff', borderRadius: 'var(--radius-sm)', border: '1px solid #bfdbfe', fontSize: '0.82rem', color: '#1e40af', marginBottom: '0.65rem' }}>
+                     <Info size={15} style={{ display: 'inline', marginRight: 6 }} />
+-                    <strong>Giai đoạn Báo Phí (QUOTED):</strong> Bảng phí đã hoàn tất ($<strong>{policy.totalPremium?.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</strong>). Thẩm quyền bước này thuộc về <strong>Khách hàng (User)</strong> để chấp thuận bảng phí & cam kết giao kết hợp đồng.
++                    <strong>Báo giá:</strong> Bảng phí đã chốt ($<strong>{policy.totalPremium?.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</strong>). Bạn kiểm tra kỹ rồi bấm nút bên dưới để đồng ý bảng phí và ký kết hợp đồng.
+                   </div>
+                   <button onClick={() => { setAgreeTerms(false); setIsBindModalOpen(true); }} className="btn btn-primary" style={{ width: '100%', padding: '0.8rem' }}>
+                     <FileCheck size={16} />
+-                    <span>Bước 3: Khách Hàng Đồng Ý & Cam Kết (QUOTED ➔ BOUND)</span>
++                    <span>Bước 3: Đồng ý & ký kết</span>
+                   </button>
+                 </div>
+               )}
+@@ -611,15 +611,15 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                     }}>
+                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, marginBottom: '0.35rem' }}>
+                         {isOverdue ? <AlertTriangle size={18} style={{ color: '#dc2626' }} /> : <Clock size={18} />}
+-                        <span>{isOverdue ? '⚠️ CẢNH BÁO: ĐÃ QUÁ HẠN THANH TOÁN PHÍ BẢO HIỂM' : '⏳ CHỜ THANH TOÁN PHÍ BẢO HIỂM (BOUND)'}</span>
++                        <span>{isOverdue ? '⚠️ Đã quá hạn thanh toán phí' : '⏳ Chờ thanh toán phí'}</span>
+                       </div>
+                       <p style={{ margin: '0 0 0.35rem 0', fontSize: '0.85rem' }}>
+-                        Cần hoàn tất nộp phí <strong>${policy.totalPremium?.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</strong> để hợp đồng chính thức kích hoạt quyền lợi bảo hiểm.
++                        Cần hoàn tất nộp phí <strong>${policy.totalPremium?.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</strong> để hợp đồng chính thức có hiệu lực.
+                       </p>
+                       <div style={{ fontSize: '0.8rem', opacity: 0.9, display: 'flex', flexWrap: 'wrap', gap: '1rem', borderTop: '1px dashed currentColor', paddingTop: '0.35rem' }}>
+-                        <span>Ngày cam kết: <strong>{policy.boundDate ? new Date(policy.boundDate).toLocaleDateString('vi-VN') : 'Mới ghi nhận'}</strong></span>
+-                        <span>Hạn chót thanh toán: <strong>{policy.paymentDueDate ? new Date(policy.paymentDueDate).toLocaleDateString('vi-VN') : 'Chưa thiết lập'}</strong></span>
+-                        <span>Tình trạng: <strong style={{ color: isOverdue ? '#dc2626' : '#047857' }}>{isOverdue ? 'HẾT HẠN (Có thể bị hủy)' : `Còn ${daysRemaining} ngày`}</strong></span>
++                        <span>Ngày ký kết: <strong>{policy.boundDate ? new Date(policy.boundDate).toLocaleDateString('vi-VN') : 'Mới ghi nhận'}</strong></span>
++                        <span>Hạn nộp phí: <strong>{policy.paymentDueDate ? new Date(policy.paymentDueDate).toLocaleDateString('vi-VN') : 'Chưa thiết lập'}</strong></span>
++                        <span>Trạng thái: <strong style={{ color: isOverdue ? '#dc2626' : '#047857' }}>{isOverdue ? 'Đã hết hạn (có thể hủy)' : `Còn ${daysRemaining} ngày`}</strong></span>
+                       </div>
+                     </div>
+ 
+@@ -631,7 +631,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                         style={{ width: '100%', padding: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontWeight: 700 }}
+                       >
+                         <CreditCard size={18} />
+-                        <span>Thanh Toán Phí Bảo Hiểm & Kích Hoạt (Xem Mã Chuyển Khoản)</span>
++                        <span>Thanh toán phí & kích hoạt (xem mã chuyển khoản)</span>
+                       </button>
+ 
+                       {/* Admin Action: Instant Offline Activation */}
+@@ -642,19 +642,19 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                           style={{ width: '100%', padding: '0.75rem', borderColor: '#10b981', color: '#047857', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontWeight: 700, backgroundColor: '#ecfdf5' }}
+                         >
+                           <Zap size={18} />
+-                          <span>Admin Kích Hoạt Ngoại Tuyến Ngay Lập Tức (Offline Approval)</span>
++                          <span>Kích hoạt ngoại tuyến</span>
+                         </button>
+                       )}
+ 
+                       {/* Overdue or Admin Cancel Option */}
+                       {(isOverdue || isAdmin) && (
+                         <button
+-                          onClick={() => handleStatusTransition('CANCELLED', 'Hủy bỏ hợp đồng do quá hạn nộp phí bảo hiểm (Payment Due Expired)')}
++                          onClick={() => handleStatusTransition('CANCELLED', 'Hủy hợp đồng do quá hạn nộp phí')}
+                           className="btn btn-danger"
+                           style={{ width: '100%', padding: '0.6rem', fontSize: '0.82rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+                         >
+                           <AlertTriangle size={15} />
+-                          <span>Hủy Hợp Đồng Do Quá Thời Hạn Nộp Phí (BOUND ➔ CANCELLED)</span>
++                          <span>Hủy do quá hạn nộp phí</span>
+                         </button>
+                       )}
+                     </div>
+@@ -666,20 +666,20 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                   <div style={{ padding: '0.75rem 1rem', backgroundColor: '#f0fdf4', borderRadius: 'var(--radius-sm)', border: '1px solid #bbf7d0', fontSize: '0.85rem', color: '#166534' }}>
+                     <CheckCircle size={16} style={{ display: 'inline', marginRight: 6 }} />
+-                    Hợp đồng đang có hiệu lực (ACTIVE). Muốn thay đổi Quyền lợi/Phí, vui lòng chuyển sang tab <strong>"3. Điều Chỉnh Endorsement"</strong>.
++                    Hợp đồng đang hiệu lực. Muốn đổi quyền lợi/phí, bạn sang tab <strong>"3. Điều chỉnh phụ lục"</strong>.
+                   </div>
+-                  <button onClick={() => handleStatusTransition('CANCELLED', 'Khách hàng đề nghị hủy bỏ trước thời hạn')} className="btn btn-danger" style={{ width: '100%' }}>
+-                    <span>Hủy Đơn Trước Thời Hạn (ACTIVE ➔ CANCELLED)</span>
++                  <button onClick={() => handleStatusTransition('CANCELLED', 'Khách hàng đề nghị hủy trước hạn')} className="btn btn-danger" style={{ width: '100%' }}>
++                    <span>Hủy hợp đồng trước hạn</span>
+                   </button>
+                   <button onClick={() => handleStatusTransition('EXPIRED', 'Hết thời hạn bảo hiểm')} className="btn btn-outline" style={{ width: '100%' }}>
+-                    <span>Đánh Dấu Hết Hạn (ACTIVE ➔ EXPIRED)</span>
++                    <span>Đánh dấu hết hạn</span>
+                   </button>
+                 </div>
+               )}
+ 
+               {['CANCELLED', 'EXPIRED'].includes(policy.status) && (
+                 <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', padding: '1rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-sm)' }}>
+-                  Hợp đồng đã ở trạng thái kết thúc ({policy.status}). Không thể thực hiện chuyển đổi vòng đời tiếp theo.
++                  Hợp đồng đã kết thúc. Không thể chuyển trạng thái tiếp.
+                 </p>
+               )}
+             </div>
+@@ -692,7 +692,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem' }}>
+                   <h4 style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                     <FileCheck size={20} />
+-                    <span>{isAdmin ? 'Admin Thiết Lập Hạn Chót & Chuyển BOUND' : 'Cam Kết Giao Kết & Đề Xuất Hạn Nộp Phí (BOUND)'}</span>
++                    <span>{isAdmin ? 'Ấn định hạn nộp phí & chuyển sang Đã ký kết' : 'Ký kết & đề xuất hạn nộp phí'}</span>
+                   </h4>
+                   <button onClick={() => setIsBindModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
+                     <X size={20} />
+@@ -701,10 +701,10 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+ 
+                 <div style={{ padding: '1rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-sm)', marginBottom: '1.25rem', fontSize: '0.875rem' }}>
+                   <p style={{ marginBottom: '0.35rem' }}><strong>Bên mua bảo hiểm:</strong> {policy.insured?.name} ({policy.insured?.type === 'BUSINESS' ? 'Doanh nghiệp' : 'Cá nhân'})</p>
+-                  <p style={{ marginBottom: '0.35rem' }}><strong>Mã hợp đồng:</strong> {policy.policyNumber}</p>
+-                  <p style={{ marginBottom: '0.35rem' }}><strong>Tổng số địa điểm:</strong> {policy.locations?.length || 0} địa điểm</p>
++                  <p style={{ marginBottom: '0.35rem' }}><strong>Số hợp đồng:</strong> {policy.policyNumber}</p>
++                  <p style={{ marginBottom: '0.35rem' }}><strong>Số địa điểm:</strong> {policy.locations?.length || 0} địa điểm</p>
+                   <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+-                    <span style={{ fontWeight: 700 }}>Tổng Phí Cam Kết:</span>
++                    <span style={{ fontWeight: 700 }}>Tổng phí cam kết:</span>
+                     <strong style={{ fontSize: '1.3rem', color: 'var(--primary)' }}>
+                       ${policy.totalPremium?.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
+                     </strong>
+@@ -716,13 +716,13 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                     <Clock size={16} style={{ color: '#166534' }} />
+                     <strong style={{ fontSize: '0.9rem', color: '#166534' }}>
+-                      {isAdmin ? 'Thiết lập Hạn chót thanh toán chính thức (Admin Direct):' : 'Đề xuất Thời hạn thanh toán phí bảo hiểm (Payment Due):'}
++                      {isAdmin ? 'Ấn định hạn nộp phí:' : 'Đề xuất hạn nộp phí:'}
+                     </strong>
+                   </div>
+                   <p style={{ fontSize: '0.8rem', color: '#166534', margin: '0 0 0.75rem 0' }}>
+                     {isAdmin
+-                      ? 'Là Quản trị viên, bạn có quyền ấn định chính xác ngày hết hạn nộp phí. Nếu quá ngày này, đơn sẽ bị hủy.'
+-                      : 'Doanh nghiệp có thể đề xuất số ngày cần thiết để trình ký kế toán và chuyển khoản phí.'}
++                      ? 'Quản trị viên được ấn định hạn nộp phí. Quá hạn này, hợp đồng sẽ tự hủy.'
++                      : 'Doanh nghiệp có thể đề xuất thêm ngày để kịp trình ký và chuyển khoản.'}
+                   </p>
+ 
+                   <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+@@ -747,13 +747,13 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                           borderRadius: 'var(--radius-sm)'
+                         }}
+                       >
+-                        +{days} Ngày
++                        +{days} ngày
+                       </button>
+                     ))}
+                   </div>
+ 
+                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+-                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1e293b' }}>Hạn chót chính xác:</label>
++                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1e293b' }}>Hạn nộp phí:</label>
+                     <input
+                       type="date"
+                       value={customDueDate}
+@@ -778,7 +778,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                         style={{ marginTop: 3, width: 16, height: 16 }}
+                       />
+                       <span>
+-                        <strong>Cam kết của Khách hàng:</strong> Tôi xác nhận thông tin kê khai là chính xác, đồng ý với bảng quyền lợi & mức phí, cam kết thanh toán trước ngày <strong>{new Date(customDueDate).toLocaleDateString('vi-VN')}</strong>.
++                        <strong>Cam kết của khách hàng:</strong> Tôi xác nhận thông tin khai báo là chính xác, đồng ý với quyền lợi và mức phí, cam kết thanh toán trước ngày <strong>{new Date(customDueDate).toLocaleDateString('vi-VN')}</strong>.
+                       </span>
+                     </label>
+                   </div>
+@@ -799,17 +799,17 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                         disabled={!agreeTerms}
+                       >
+                         <FileCheck size={16} />
+-                        <span>Gửi Đề Xuất Hạn Nộp Phí (BOUND)</span>
++                        <span>Gửi đề xuất hạn nộp phí</span>
+                       </button>
+ 
+                       <button
+                         onClick={() => handleConfirmBind(true)}
+                         className="btn btn-primary"
+                         style={{ padding: '0.5rem 1.25rem', fontWeight: 700, backgroundColor: '#7c3aed', borderColor: '#6d28d9' }}
+-                        title="Mô phỏng Admin phê duyệt ngay đề xuất ngày hết hạn để phục vụ kiểm thử"
++                        title="Mô phỏng quản trị viên duyệt ngay (dùng khi demo)"
+                       >
+                         <Zap size={16} />
+-                        <span>⚡ Giả Lập Admin Phê Duyệt Ngay (Demo Chuyển BOUND)</span>
++                        <span>⚡ Duyệt ngay (demo)</span>
+                       </button>
+                     </>
+                   ) : (
+@@ -820,7 +820,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                       style={{ padding: '0.5rem 1.25rem', fontWeight: 700, backgroundColor: '#10b981', borderColor: '#059669' }}
+                     >
+                       <Zap size={16} />
+-                      <span>⚡ Admin Thiết Lập Hạn Chót & Chuyển BOUND</span>
++                      <span>⚡ Ấn định hạn nộp phí & chuyển sang Đã ký kết</span>
+                     </button>
+                   )}
+                 </div>
+@@ -835,7 +835,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem' }}>
+                   <h4 style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                     <CreditCard size={22} />
+-                    <span>Cổng Thanh Toán Phí Bảo Hiểm Trực Tuyến</span>
++                    <span>Thanh toán trực tuyến</span>
+                   </h4>
+                   <button onClick={() => setIsPayActiveModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
+                     <X size={20} />
+@@ -845,13 +845,13 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                 {/* Amount to pay banner */}
+                 <div style={{ padding: '1rem 1.25rem', backgroundColor: 'var(--primary-light)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                   <div>
+-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Số tiền phí bảo hiểm cần thanh toán</span>
++                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Số tiền cần thanh toán</span>
+                     <div style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--primary)' }}>
+                       ${policy.totalPremium?.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
+                     </div>
+                   </div>
+                   <div style={{ textAlign: 'right' }}>
+-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Quy đổi ước tính (Tỷ giá VCB)</span>
++                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Quy đổi ước tính (tỷ giá Vietcombank)</span>
+                     <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--secondary)' }}>
+                       ~{((policy.totalPremium || 0) * 25450).toLocaleString('vi-VN')} VNĐ
+                     </div>
+@@ -862,17 +862,17 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                 <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '1rem', padding: '1.25rem', backgroundColor: '#f8fafc', borderRadius: 'var(--radius-md)', border: '1px solid #e2e8f0', marginBottom: '1.25rem' }}>
+                   <div>
+                     <h5 style={{ fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', fontWeight: 800, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+-                      <Building size={16} /> Thông Tin Chuyển Khoản Doanh Nghiệp
++                      <Building size={16} /> Thông tin chuyển khoản
+                     </h5>
+ 
+                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.85rem' }}>
+                       <div>
+-                        <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem' }}>Ngân Hàng Thụ Hưởng:</span>
++                        <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem' }}>Ngân hàng nhận:</span>
+                         <strong style={{ color: '#0f172a' }}>VIETCOMBANK (Ngân Hàng Ngoại Thương)</strong>
+                       </div>
+ 
+                       <div>
+-                        <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem' }}>Số Tài Khoản Nhận Phí:</span>
++                        <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem' }}>Số tài khoản:</span>
+                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                           <strong style={{ fontSize: '1.05rem', color: 'var(--primary)', letterSpacing: '0.5px' }}>1903 8888 6666 99</strong>
+                           <button
+@@ -881,18 +881,18 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                             className="btn btn-outline"
+                             style={{ padding: '0.15rem 0.45rem', fontSize: '0.7rem' }}
+                           >
+-                            <Copy size={12} /> {copiedBank ? 'Đã chép!' : 'Sao chép'}
++                            <Copy size={12} /> {copiedBank ? 'Đã sao chép!' : 'Sao chép'}
+                           </button>
+                         </div>
+                       </div>
+ 
+                       <div>
+-                        <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem' }}>Tên Chủ Tài Khoản:</span>
++                        <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem' }}>Chủ tài khoản:</span>
+                         <strong style={{ color: '#0f172a' }}>CONG TY CP BAO HIEM DOANH NGHIEP INSURTECH</strong>
+                       </div>
+ 
+                       <div>
+-                        <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem' }}>Nội Dung Bắt Buộc:</span>
++                        <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.75rem' }}>Nội dung chuyển khoản:</span>
+                         <code style={{ padding: '0.2rem 0.5rem', backgroundColor: '#e2e8f0', borderRadius: 4, fontWeight: 700, color: 'var(--primary)' }}>
+                           THANH TOAN {policy.policyNumber}
+                         </code>
+@@ -906,19 +906,19 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                       <QrCode size={70} style={{ color: 'var(--primary)' }} />
+                     </div>
+                     <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--primary)' }}>VIETQR CHUYỂN NHANH</span>
+-                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Quét bằng ứng dụng Ngân hàng</span>
++                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Quét bằng app ngân hàng</span>
+                   </div>
+                 </div>
+ 
+                 {/* Simulation Notice */}
+                 <div style={{ padding: '0.75rem 1rem', backgroundColor: '#eff6ff', borderRadius: 'var(--radius-sm)', border: '1px solid #bfdbfe', fontSize: '0.82rem', color: '#1e40af', marginBottom: '1.25rem' }}>
+                   <Info size={16} style={{ display: 'inline', marginRight: 6 }} />
+-                  <strong>Cơ chế kiểm thử / Demo:</strong> Khách hàng có thể bấm nút <strong>"Giả Lập Đã Thanh Toán & Kích Hoạt"</strong> bên dưới. Hệ thống sẽ mô phỏng tín hiệu Webhook xác nhận từ ngân hàng và chuyển hợp đồng sang <strong>ACTIVE</strong> ngay lập tức!
++                  <strong>Chế độ demo:</strong> Bạn có thể bấm nút <strong>"Giả lập đã thanh toán & kích hoạt"</strong> bên dưới. Hệ thống sẽ giả lập xác nhận từ ngân hàng rồi kích hoạt hợp đồng <strong>có hiệu lực</strong> ngay!
+                 </div>
+ 
+                 <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                   <button onClick={() => setIsPayActiveModalOpen(false)} className="btn btn-outline" style={{ padding: '0.6rem 1.1rem' }} disabled={isPayingSimulation}>
+-                    Đóng lại
++                    Đóng
+                   </button>
+                   <button
+                     onClick={handleConfirmActive}
+@@ -929,7 +929,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                     {isPayingSimulation ? (
+                       <><RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} /><span>Đang xác thực giao dịch...</span></>
+                     ) : (
+-                      <><Zap size={18} /><span>⚡ Giả Lập Đã Thanh Toán & Kích Hoạt ACTIVE</span></>
++                      <><Zap size={18} /><span>⚡ Giả lập đã thanh toán & kích hoạt</span></>
+                     )}
+                   </button>
+                 </div>
+@@ -944,7 +944,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem' }}>
+                   <h4 style={{ color: '#047857', fontWeight: 800, fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                     <Zap size={20} />
+-                    <span>Admin Kích Hoạt Ngoại Tuyến (Offline Approval)</span>
++                    <span>Kích hoạt ngoại tuyến</span>
+                   </h4>
+                   <button onClick={() => setIsAdminOfflineConfirmOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
+                     <X size={20} />
+@@ -952,14 +952,14 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                 </div>
+ 
+                 <div style={{ padding: '1rem', backgroundColor: '#ecfdf5', borderRadius: 'var(--radius-sm)', border: '1px solid #a7f3d0', marginBottom: '1.25rem', fontSize: '0.875rem', color: '#065f46' }}>
+-                  <p style={{ marginBottom: '0.5rem' }}><strong>Thao tác đặc quyền Quản trị viên:</strong></p>
++                  <p style={{ marginBottom: '0.5rem' }}><strong>Thao tác dành riêng cho quản trị viên:</strong></p>
+                   <p style={{ margin: 0 }}>
+-                    Bạn đang kích hoạt hiệu lực hợp đồng <strong>{policy.policyNumber}</strong> của khách hàng <strong>{policy.insured?.name}</strong> theo hình thức <strong>Thanh toán Ngoại Tuyến</strong> (tiền mặt tại quầy / ủy nhiệm chi giấy / bảo lãnh ngân hàng).
++                    Bạn sắp kích hoạt hiệu lực cho hợp đồng <strong>{policy.policyNumber}</strong> của khách hàng <strong>{policy.insured?.name}</strong> theo hình thức <strong>thanh toán trực tiếp</strong> (tiền mặt, ủy nhiệm chi hoặc bảo lãnh ngân hàng).
+                   </p>
+                 </div>
+ 
+                 <div style={{ padding: '0.85rem 1rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-sm)', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+-                  <span style={{ fontSize: '0.9rem', fontWeight: 700 }}>Số Tiền Phí Xác Nhận Đã Thu:</span>
++                  <span style={{ fontSize: '0.9rem', fontWeight: 700 }}>Số tiền đã thu:</span>
+                   <strong style={{ fontSize: '1.3rem', color: 'var(--primary)' }}>
+                     ${policy.totalPremium?.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
+                   </strong>
+@@ -971,7 +971,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                   </button>
+                   <button onClick={handleAdminOfflineActive} className="btn btn-primary" style={{ padding: '0.5rem 1.3rem', backgroundColor: '#059669', borderColor: '#059669' }}>
+                     <CheckCircle size={16} />
+-                    <span>Xác Nhận Kích Hoạt ACTIVE Ngay</span>
++                    <span>Xác nhận kích hoạt ngay</span>
+                   </button>
+                 </div>
+               </div>
+@@ -987,18 +987,18 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+             <div style={{ padding: '1rem 1.25rem', backgroundColor: '#eff6ff', color: '#1e40af', borderRadius: 'var(--radius-md)', border: '1px solid #bfdbfe', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+               <Lock size={20} style={{ flexShrink: 0 }} />
+               <div style={{ fontSize: '0.875rem' }}>
+-                <strong>Quy tắc nghiệp vụ:</strong> Hợp đồng đang ở trạng thái <strong>ACTIVE</strong>. Không cho phép sửa đổi hoặc xóa trực tiếp Địa điểm/Quyền lợi tại đây. Mọi thay đổi bắt buộc phải thực hiện thông qua <strong>Endorsement (Phụ lục hợp đồng)</strong> ở tab <strong>"3. Điều Chỉnh Endorsement"</strong> để bảo toàn lịch sử và tạo Snapshot phiên bản mới.
++                <strong>Lưu ý:</strong> Hợp đồng đang hiệu lực. Không sửa/xóa trực tiếp địa điểm và quyền lợi ở đây — mọi thay đổi thực hiện qua <strong>phụ lục hợp đồng</strong> ở tab <strong>"3. Điều chỉnh phụ lục"</strong> để lưu lại lịch sử và tạo phiên bản mới.
+               </div>
+             </div>
+           ) : (
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+               <div>
+-                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>Kê Khai Địa Điểm & Quyền Lợi (P04, P05)</h3>
+-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Cập nhật vị trí nhà xưởng/kho hàng và các gói quyền lợi bảo hiểm (Chỉ áp dụng khi Hợp đồng ở trạng thái DRAFT)</p>
++                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>Địa điểm & quyền lợi</h3>
++                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Chỉ chỉnh sửa được khi hợp đồng đang ở trạng thái nháp</p>
+               </div>
+               <button onClick={() => setIsAddLocOpen(true)} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+                 <Plus size={16} />
+-                <span>Thêm Địa Điểm Mới</span>
++                <span>Thêm địa điểm mới</span>
+               </button>
+             </div>
+           )}
+@@ -1006,10 +1006,10 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+           {/* Modal Add Location (DRAFT) */}
+           {isAddLocOpen && policy.status === 'DRAFT' && (
+             <div className="card" style={{ marginBottom: '1.5rem', backgroundColor: 'var(--primary-light)', border: '2px solid var(--primary)' }}>
+-              <h4 style={{ color: 'var(--primary)', fontWeight: 700, marginBottom: '0.75rem' }}>Kê Khai Địa Điểm Bảo Hiểm Mới</h4>
++              <h4 style={{ color: 'var(--primary)', fontWeight: 700, marginBottom: '0.75rem' }}>Khai báo địa điểm mới</h4>
+               <form onSubmit={handleAddLocationSubmit}>
+                 <div className="form-group">
+-                  <label className="form-label">Địa chỉ Chi tiết Nhà xưởng / Kho hàng / Văn phòng</label>
++                  <label className="form-label">Địa chỉ nhà xưởng / kho hàng / văn phòng</label>
+                   <input
+                     type="text"
+                     className="form-input"
+@@ -1020,8 +1020,8 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                   />
+                 </div>
+                 <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+-                  <button type="button" onClick={() => setIsAddLocOpen(false)} className="btn btn-outline" style={{ padding: '0.4rem 0.85rem' }}>Hủy bỏ</button>
+-                  <button type="submit" className="btn btn-primary" style={{ padding: '0.4rem 1rem' }}>Lưu Địa Điểm Mới</button>
++                  <button type="button" onClick={() => setIsAddLocOpen(false)} className="btn btn-outline" style={{ padding: '0.4rem 0.85rem' }}>Hủy</button>
++                  <button type="submit" className="btn btn-primary" style={{ padding: '0.4rem 1rem' }}>Lưu địa điểm</button>
+                 </div>
+               </form>
+             </div>
+@@ -1030,11 +1030,11 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+           {/* Modal Add Coverage (DRAFT) */}
+           {isAddCovOpen && policy.status === 'DRAFT' && (
+             <div className="card" style={{ marginBottom: '1.5rem', backgroundColor: 'var(--secondary-light)', border: '2px solid var(--secondary)' }}>
+-              <h4 style={{ color: 'var(--secondary)', fontWeight: 700, marginBottom: '0.75rem' }}>Bổ Sung Gói Quyền Lợi Bảo Hiểm cho Địa điểm {targetLocId}</h4>
++              <h4 style={{ color: 'var(--secondary)', fontWeight: 700, marginBottom: '0.75rem' }}>Thêm gói quyền lợi cho địa điểm {targetLocId}</h4>
+               <form onSubmit={handleAddCoverageSubmit}>
+                 <div className="grid-2" style={{ marginBottom: '1rem' }}>
+                   <div>
+-                    <label className="form-label">Chọn Gói Bảo Hiểm Mẫu</label>
++                    <label className="form-label">Chọn gói mẫu</label>
+                     <select
+                       className="form-select"
+                       onChange={(e) => {
+@@ -1057,7 +1057,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                   </div>
+ 
+                   <div>
+-                    <label className="form-label">Mã Quyền Lợi (Coverage Code)</label>
++                    <label className="form-label">Mã gói</label>
+                     <input
+                       type="text"
+                       className="form-input"
+@@ -1068,7 +1068,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                   </div>
+ 
+                   <div>
+-                    <label className="form-label">Hạn Mức Tối Đa (Limit $ USD)</label>
++                    <label className="form-label">Hạn mức tối đa (USD)</label>
+                     <input
+                       type="number"
+                       className="form-input"
+@@ -1079,7 +1079,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                   </div>
+ 
+                   <div>
+-                    <label className="form-label">Mức Miễn Trừ (Deductible $ USD)</label>
++                    <label className="form-label">Mức miễn thường (USD)</label>
+                     <input
+                       type="number"
+                       className="form-input"
+@@ -1090,7 +1090,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                   </div>
+ 
+                   <div style={{ gridColumn: '1 / -1' }}>
+-                    <label className="form-label">Phí Bảo Hiểm (Coverage Premium $ USD)</label>
++                    <label className="form-label">Phí bảo hiểm (USD)</label>
+                     <input
+                       type="number"
+                       className="form-input"
+@@ -1102,8 +1102,8 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                 </div>
+ 
+                 <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+-                  <button type="button" onClick={() => setIsAddCovOpen(false)} className="btn btn-outline" style={{ padding: '0.4rem 0.85rem' }}>Hủy bỏ</button>
+-                  <button type="submit" className="btn btn-secondary" style={{ padding: '0.4rem 1rem' }}>+ Bổ Sung Quyền Lợi</button>
++                  <button type="button" onClick={() => setIsAddCovOpen(false)} className="btn btn-outline" style={{ padding: '0.4rem 0.85rem' }}>Hủy</button>
++                  <button type="submit" className="btn btn-secondary" style={{ padding: '0.4rem 1rem' }}>+ Thêm quyền lợi</button>
+                 </div>
+               </form>
+             </div>
+@@ -1121,11 +1121,11 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                   <div style={{ display: 'flex', gap: '0.5rem' }}>
+                     <button onClick={() => handleOpenAddCoverage(loc.locationId)} className="btn btn-outline" style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}>
+                       <Plus size={14} />
+-                      <span>Thêm Gói Bảo Hiểm</span>
++                      <span>Thêm gói bảo hiểm</span>
+                     </button>
+                     <button onClick={() => handleRemoveLocation(loc.locationId)} className="btn btn-outline" style={{ padding: '0.35rem 0.65rem', fontSize: '0.8rem', color: '#ef4444' }}>
+                       <Trash2 size={14} />
+-                      <span>Xóa Địa Điểm</span>
++                      <span>Xóa địa điểm</span>
+                     </button>
+                   </div>
+                 )}
+@@ -1134,18 +1134,18 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+               {/* Coverages Table */}
+               {(!loc.coverages || loc.coverages.length === 0) ? (
+                 <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '1rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-sm)' }}>
+-                  Chưa kê khai gói quyền lợi bảo hiểm nào cho địa điểm này.
++                  Địa điểm này chưa có gói quyền lợi nào.
+                 </p>
+               ) : (
+                 <div className="table-container">
+                   <table className="custom-table">
+                     <thead>
+                       <tr>
+-                        <th>Mã Quyền Lợi</th>
+-                        <th>Tên Quyền Lợi Bảo Hiểm</th>
+-                        <th>Hạn Mức Bồi Thường (Limit)</th>
+-                        <th>Mức Miễn Trừ (Deductible)</th>
+-                        <th style={{ textAlign: 'right' }}>Phí Bảo Hiểm ($USD)</th>
++                        <th>Mã gói</th>
++                        <th>Tên gói</th>
++                        <th>Hạn mức bồi thường</th>
++                        <th>Miễn thường</th>
++                        <th style={{ textAlign: 'right' }}>Phí bảo hiểm (USD)</th>
+                         {policy.status === 'DRAFT' && <th>Thao tác</th>}
+                       </tr>
+                     </thead>
+@@ -1164,7 +1164,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                               <button
+                                 onClick={() => handleRemoveCoverage(loc.locationId, c.coverageCode)}
+                                 style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}
+-                                title="Loại bỏ gói quyền lợi"
++                                title="Bỏ gói quyền lợi"
+                               >
+                                 <Trash2 size={16} />
+                               </button>
+@@ -1187,32 +1187,32 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+             <div>
+               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>
+-                Đợt Điều Chỉnh Phụ Lục Hợp Đồng (Endorsement Engine)
++                Đợt điều chỉnh phụ lục
+               </h3>
+               <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.2rem' }}>
+-                Endorsement áp dụng trên hợp đồng <strong>ACTIVE</strong>: Tự động lưu <strong>Snapshot Version hiện tại (V{policy.version})</strong>, thực hiện sửa đổi, tính lại <strong>Total Premium = SUM(Coverages)</strong>, và nâng cấp hợp đồng lên <strong>Version V{policy.version + 1}</strong>.
++                Điều chỉnh áp dụng cho hợp đồng đang hiệu lực: hệ thống tự lưu lại phiên bản hiện tại (<strong>V{policy.version}</strong>), tính lại tổng phí và nâng hợp đồng lên <strong>V{policy.version + 1}</strong>.
+               </p>
+             </div>
+             <span className="brand-badge" style={{ backgroundColor: 'var(--primary)', color: 'white', padding: '0.4rem 0.8rem' }}>
+-              CURRENT: V{policy.version} ➔ NEXT: V{policy.version + 1}
++              Hiện tại: V{policy.version} → tiếp theo: V{policy.version + 1}
+             </span>
+           </div>
+ 
+           {policy.status !== 'ACTIVE' ? (
+             <div style={{ padding: '1.25rem', backgroundColor: '#fef3c7', color: '#92400e', borderRadius: 'var(--radius-md)', border: '1px solid #fde68a' }}>
+               <AlertTriangle size={20} style={{ display: 'inline', marginRight: 8 }} />
+-              <strong>Chưa thể thực hiện Endorsement:</strong> Hợp đồng hiện đang ở trạng thái <strong>{policy.status}</strong>. Endorsement chỉ được phép áp dụng khi hợp đồng đang có hiệu lực (<strong>ACTIVE</strong>).
++              <strong>Chưa điều chỉnh được:</strong> Hợp đồng đang ở trạng thái <strong>{policy.status}</strong>. Chỉ điều chỉnh được khi hợp đồng đang hiệu lực.
+             </div>
+           ) : (
+             <form onSubmit={handleEndorsementSubmit}>
+               {/* Select Endorsement Operation Type */}
+               <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+-                <label className="form-label" style={{ fontWeight: 700 }}>1. Loại Điều Chỉnh Phụ Lục (Endorsement Type)</label>
++                <label className="form-label" style={{ fontWeight: 700 }}>1. Loại điều chỉnh</label>
+                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+                   {[
+-                    { id: 'ADD_COVERAGE', title: '+ Thêm Quyền Lợi Mới', desc: 'Bổ sung bảo hiểm mới (VD: Cyber Liability)' },
+-                    { id: 'REMOVE_COVERAGE', title: '- Loại Bỏ Quyền Lợi', desc: 'Hủy bỏ một gói bảo hiểm hiện có' },
+-                    { id: 'GENERAL', title: 'Phụ Lục Điều Khoản Chung', desc: 'Ghi nhận điều chỉnh hợp đồng khác' },
++                    { id: 'ADD_COVERAGE', title: '+ Thêm quyền lợi', desc: 'Bổ sung gói mới (ví dụ: an ninh mạng)' },
++                    { id: 'REMOVE_COVERAGE', title: '− Bỏ quyền lợi', desc: 'Bỏ một gói đang có' },
++                    { id: 'GENERAL', title: 'Phụ lục điều khoản chung', desc: 'Ghi nhận điều chỉnh khác' },
+                   ].map((t) => (
+                     <div
+                       key={t.id}
+@@ -1239,11 +1239,11 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+               {endorseType === 'ADD_COVERAGE' && (
+                 <div style={{ padding: '1.25rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)', marginBottom: '1.25rem' }}>
+                   <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '1rem' }}>
+-                    2. Chi Tiết Gói Quyền Lợi Cần Bổ Sung
++                    2. Quyền lợi cần bổ sung
+                   </h4>
+                   <div className="grid-2" style={{ gap: '1rem' }}>
+                     <div className="form-group">
+-                      <label className="form-label">Địa Điểm Áp Dụng</label>
++                      <label className="form-label">Địa điểm áp dụng</label>
+                       <select className="form-select" value={endorseLocId} onChange={(e) => setEndorseLocId(e.target.value)}>
+                         {policy.locations?.map((l) => (
+                           <option key={l.locationId} value={l.locationId}>{l.locationId} - {l.address}</option>
+@@ -1252,7 +1252,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                     </div>
+ 
+                     <div className="form-group">
+-                      <label className="form-label">Chọn Gói Quyền Lợi Mẫu</label>
++                      <label className="form-label">Chọn gói mẫu</label>
+                       <select
+                         className="form-select"
+                         value={endorseCovCode}
+@@ -1275,12 +1275,12 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                     </div>
+ 
+                     <div className="form-group">
+-                      <label className="form-label">Hạn Mức Bồi Thường ($USD)</label>
++                      <label className="form-label">Hạn mức bồi thường (USD)</label>
+                       <input type="number" className="form-input" value={endorseLimit} onChange={(e) => setEndorseLimit(Number(e.target.value))} required />
+                     </div>
+ 
+                     <div className="form-group">
+-                      <label className="form-label">Phí Bảo Hiểm Cần Tăng Thêm ($USD)</label>
++                      <label className="form-label">Phí cần tăng thêm (USD)</label>
+                       <input type="number" className="form-input" value={endorsePremium} onChange={(e) => setEndorsePremium(Number(e.target.value))} required />
+                     </div>
+                   </div>
+@@ -1290,11 +1290,11 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+               {endorseType === 'REMOVE_COVERAGE' && (
+                 <div style={{ padding: '1.25rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)', marginBottom: '1.25rem' }}>
+                   <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '1rem' }}>
+-                    2. Chọn Gói Quyền Lợi Cần Loại Bỏ
++                    2. Quyền lợi cần loại bỏ
+                   </h4>
+                   <div className="grid-2" style={{ gap: '1rem' }}>
+                     <div className="form-group">
+-                      <label className="form-label">Địa Điểm Áp Dụng</label>
++                      <label className="form-label">Địa điểm áp dụng</label>
+                       <select className="form-select" value={endorseLocId} onChange={(e) => setEndorseLocId(e.target.value)}>
+                         {policy.locations?.map((l) => (
+                           <option key={l.locationId} value={l.locationId}>{l.locationId} - {l.address}</option>
+@@ -1303,14 +1303,14 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                     </div>
+ 
+                     <div className="form-group">
+-                      <label className="form-label">Mã Gói Cần Loại Bỏ</label>
++                      <label className="form-label">Gói cần loại bỏ</label>
+                       <select className="form-select" value={endorseCovCode} onChange={(e) => {
+                         setEndorseCovCode(e.target.value);
+                         setEndorseDescription(`Loại bỏ gói bảo hiểm ${e.target.value} khỏi ${endorseLocId}`);
+                       }}>
+                         {policy.locations?.find(l => l.locationId === endorseLocId)?.coverages?.map((c) => (
+                           <option key={c.coverageCode} value={c.coverageCode}>{c.coverageCode} - {c.coverageName}</option>
+-                        )) || <option value="">Không có gói nào</option>}
++                        )) || <option value="">Chưa có gói nào</option>}
+                       </select>
+                     </div>
+                   </div>
+@@ -1319,12 +1319,12 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+ 
+               <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                 <label className="form-label" style={{ fontWeight: 700 }}>
+-                  3. Lý Do / Nội Dung Ghi Nhận Đợt Endorsement <span style={{ color: 'red' }}>*</span>
++                  3. Lý do điều chỉnh <span style={{ color: 'red' }}>*</span>
+                 </label>
+                 <textarea
+                   className="form-input"
+                   rows={3}
+-                  placeholder="Ví dụ: Bổ sung quyền lợi bảo hiểm Cyber Liability với hạn mức $1,000,000 theo yêu cầu khách hàng."
++                  placeholder="Ví dụ: bổ sung gói an ninh mạng theo yêu cầu khách hàng"
+                   value={endorseDescription}
+                   onChange={(e) => setEndorseDescription(e.target.value)}
+                   required
+@@ -1333,11 +1333,11 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+ 
+               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                 <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+-                  * Hệ thống sẽ tự động cập nhật Audit Trail và tạo bản lưu Snapshot Version V{policy.version}.
++                  * Hệ thống sẽ tự ghi nhật ký và lưu lại phiên bản V{policy.version}.
+                 </span>
+                 <button type="submit" className="btn btn-primary" style={{ padding: '0.85rem 1.5rem' }}>
+                   <FileDiff size={18} />
+-                  <span>Thực Thi Endorsement ➔ Nâng Cấp Lên V{policy.version + 1}</span>
++                  <span>Lưu điều chỉnh → lên V{policy.version + 1}</span>
+                 </button>
+               </div>
+             </form>
+@@ -1351,29 +1351,29 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+             <div>
+               <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>
+-                Vết Giao Dịch Hợp Đồng (Audit Transaction Log Trail)
++                Nhật ký giao dịch hợp đồng
+               </h3>
+               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+-                Lịch sử toàn bộ các sự kiện thay đổi trên Hợp đồng (Immutable Audit Log)
++                Toàn bộ thay đổi trên hợp đồng, mới nhất lên trước
+               </p>
+             </div>
+             <button onClick={fetchHistory} className="btn btn-outline" style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}>
+-              <RefreshCw size={14} /> Làm mới Log
++              <RefreshCw size={14} /> Tải lại
+             </button>
+           </div>
+ 
+           {history.length === 0 ? (
+-            <p style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>Chưa ghi nhận giao dịch nào cho hợp đồng này.</p>
++            <p style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>Chưa có thay đổi nào được ghi nhận.</p>
+           ) : (
+             <div className="table-container">
+               <table className="custom-table">
+                 <thead>
+                   <tr>
+-                    <th>Thời gian Giao dịch</th>
+-                    <th>Loại Giao Dịch (Event Type)</th>
++                    <th>Thời gian</th>
++                    <th>Loại thay đổi</th>
+                     <th>Phiên bản</th>
+-                    <th>Người Thực Hiện (Actor)</th>
+-                    <th>Chi Tiết Thay Đổi</th>
++                    <th>Người thực hiện</th>
++                    <th>Chi tiết thay đổi</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+@@ -1412,16 +1412,16 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+             <div>
+               <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>
+-                Truy Vấn Ảnh Chụp Phiên Bản Lịch Sử Snapshot (P08)
++                Các phiên bản đã lưu
+               </h3>
+               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+-                Mỗi khi Endorsement diễn ra, toàn bộ trạng thái Hợp đồng được lưu trữ nguyên vẹn thành Snapshot bất biến trong MongoDB collection <code>policy_versions</code>.
++                Mỗi lần điều chỉnh, hệ thống tự lưu lại toàn bộ hợp đồng để tra cứu về sau.
+               </p>
+             </div>
+           </div>
+ 
+           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+-            <span style={{ fontSize: '0.9rem', fontWeight: 700, marginRight: '0.5rem' }}>Chọn Snapshot Phiên Bản:</span>
++            <span style={{ fontSize: '0.9rem', fontWeight: 700, marginRight: '0.5rem' }}>Chọn phiên bản:</span>
+             {availableVersions.map((v) => (
+               <button
+                 key={v}
+@@ -1429,7 +1429,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                 className={`btn ${selectedVersionNum === v ? 'btn-primary' : 'btn-outline'}`}
+                 style={{ padding: '0.4rem 0.9rem', fontSize: '0.85rem' }}
+               >
+-                Snapshot V{v} {v === policy.version ? '(Hiện Tại)' : ''}
++                Phiên bản V{v} {v === policy.version ? '(hiện tại)' : ''}
+               </button>
+             ))}
+           </div>
+@@ -1439,14 +1439,14 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                 <div>
+                   <h4 style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.1rem', margin: 0 }}>
+-                    Ảnh Chụp Snapshot Phiên Bản V{versionSnapshot.version} của {versionSnapshot.policyNumber}
++                    Phiên bản V{versionSnapshot.version} của {versionSnapshot.policyNumber}
+                   </h4>
+                   <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+-                    Thời điểm chụp: {new Date(versionSnapshot.createdAt || Date.now()).toLocaleString('vi-VN')} | Người lập: {versionSnapshot.createdBy}
++                    Lưu lúc: {new Date(versionSnapshot.createdAt || Date.now()).toLocaleString('vi-VN')} | Người lập: {versionSnapshot.createdBy}
+                   </span>
+                 </div>
+                 <div style={{ textAlign: 'right' }}>
+-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tổng phí tại Version này</span>
++                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tổng phí phiên bản này</span>
+                   <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--primary)' }}>
+                     ${versionSnapshot.policySnapshot?.totalPremium?.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
+                   </div>
+@@ -1456,18 +1456,18 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+               {/* Snapshot Details */}
+               <div className="grid-2" style={{ fontSize: '0.875rem', marginBottom: '1.5rem' }}>
+                 <div>
+-                  <p><strong>Trạng thái lúc chụp:</strong> <StatusBadge status={versionSnapshot.policySnapshot?.status} /></p>
++                  <p><strong>Trạng thái khi lưu:</strong> <StatusBadge status={versionSnapshot.policySnapshot?.status} /></p>
+                   <p><strong>Bên mua bảo hiểm:</strong> {versionSnapshot.policySnapshot?.insured?.name}</p>
+                 </div>
+                 <div>
+-                  <p><strong>Số lượng Địa điểm:</strong> {versionSnapshot.policySnapshot?.locations?.length || 0} địa điểm</p>
++                  <p><strong>Số địa điểm:</strong> {versionSnapshot.policySnapshot?.locations?.length || 0} địa điểm</p>
+                   <p><strong>Email:</strong> {versionSnapshot.policySnapshot?.insured?.email}</p>
+                 </div>
+               </div>
+ 
+               {/* Snapshot Locations & Coverages Table */}
+               <h5 style={{ fontWeight: 700, marginBottom: '0.5rem', color: 'var(--primary)' }}>
+-                Chi tiết Địa điểm & Quyền lợi được bảo vệ tại Snapshot V{versionSnapshot.version}:
++                Địa điểm & quyền lợi tại V{versionSnapshot.version}:
+               </h5>
+               {versionSnapshot.policySnapshot?.locations?.map((loc) => (
+                 <div key={loc.locationId} style={{ marginBottom: '1rem', backgroundColor: 'white', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}>
+@@ -1478,11 +1478,11 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+                     <table className="custom-table" style={{ fontSize: '0.82rem' }}>
+                       <thead>
+                         <tr>
+-                          <th>Mã Gói</th>
+-                          <th>Tên Quyền Lợi</th>
+-                          <th>Hạn Mức</th>
+-                          <th>Miễn Trừ</th>
+-                          <th style={{ textAlign: 'right' }}>Phí Bảo Hiểm</th>
++                          <th>Mã gói</th>
++                          <th>Tên gói</th>
++                          <th>Hạn mức</th>
++                          <th>Miễn thường</th>
++                          <th style={{ textAlign: 'right' }}>Phí bảo hiểm</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+@@ -1505,7 +1505,7 @@ export const PolicyDetail = ({ user, isAdmin }) => {
+             </div>
+           ) : (
+             <p style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+-              Đang tải snapshot cho Version V{selectedVersionNum}...
++              Đang tải phiên bản V{selectedVersionNum}...
+             </p>
+           )}
+         </div>
+diff --git a/frontend/src/pages/Profile.jsx b/frontend/src/pages/Profile.jsx
+index 20cba3b..7a4b87d 100644
+--- a/frontend/src/pages/Profile.jsx
++++ b/frontend/src/pages/Profile.jsx
+@@ -20,34 +20,34 @@ export const Profile = ({ user, onUpdateUser }) => {
+   const handleProfileSubmit = (e) => {
+     e.preventDefault();
+     onUpdateUser({ ...user, ...formData });
+-    setMessage({ type: 'success', text: 'Cập nhật thông tin cá nhân thành công!' });
++    setMessage({ type: 'success', text: 'Đã lưu thông tin cá nhân ✓' });
+     setTimeout(() => setMessage({ type: '', text: '' }), 4000);
+   };
+ 
+   const handlePasswordSubmit = (e) => {
+     e.preventDefault();
+     if (passwordData.newPassword.length < 6) {
+-      setMessage({ type: 'error', text: 'Mật khẩu mới phải có tối thiểu 6 ký tự' });
++      setMessage({ type: 'error', text: 'Mật khẩu mới cần ít nhất 6 ký tự' });
+       return;
+     }
+     if (passwordData.newPassword !== passwordData.confirmPassword) {
+-      setMessage({ type: 'error', text: 'Xác nhận mật khẩu mới không khớp' });
++      setMessage({ type: 'error', text: 'Hai lần nhập chưa khớp nhau, bạn kiểm tra lại nhé' });
+       return;
+     }
+-    setMessage({ type: 'success', text: 'Đổi mật khẩu thành công!' });
++    setMessage({ type: 'success', text: 'Đổi mật khẩu thành công ✓' });
+     setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+     setTimeout(() => setMessage({ type: '', text: '' }), 4000);
+   };
+ 
+   return (
+     <div style={{ maxWidth: 800, margin: '0 auto' }}>
+-      <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+-        <div className="user-avatar" style={{ width: 64, height: 64, fontSize: '1.5rem' }}>
+-          {formData.fullName ? formData.fullName.charAt(0).toUpperCase() : 'U'}
++      <div className="v2-anim v2-d1" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
++        <div className="v2-avatar-ring v2-anim">
++          <div>{formData.fullName ? formData.fullName.charAt(0).toUpperCase() : 'U'}</div>
+         </div>
+         <div>
+-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)' }}>Trang Cá Nhân</h1>
+-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Quản lý thông tin tài khoản và an toàn bảo mật</p>
++          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)' }}>Hồ sơ cá nhân</h1>
++          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Quản lý thông tin tài khoản và bảo mật</p>
+         </div>
+       </div>
+ 
+@@ -69,15 +69,15 @@ export const Profile = ({ user, onUpdateUser }) => {
+ 
+       <div className="grid-2">
+         {/* Profile Info Form */}
+-        <div className="card">
++        <div className="card v2-card-lift v2-anim v2-d2">
+           <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '1.25rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+             <User size={20} />
+-            <span>Thông tin Cá nhân</span>
++            <span>Thông tin cá nhân</span>
+           </h3>
+ 
+           <form onSubmit={handleProfileSubmit}>
+             <div className="form-group">
+-              <label className="form-label">Họ và Tên</label>
++              <label className="form-label">Họ và tên</label>
+               <input
+                 type="text"
+                 className="form-input"
+@@ -88,7 +88,7 @@ export const Profile = ({ user, onUpdateUser }) => {
+             </div>
+ 
+             <div className="form-group">
+-              <label className="form-label">Địa chỉ Gmail</label>
++              <label className="form-label">Email</label>
+               <input
+                 type="email"
+                 className="form-input"
+@@ -120,16 +120,16 @@ export const Profile = ({ user, onUpdateUser }) => {
+ 
+             <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+               <Save size={18} />
+-              <span>Lưu Thông tin</span>
++              <span>Lưu thay đổi</span>
+             </button>
+           </form>
+         </div>
+ 
+         {/* Change Password Form */}
+-        <div className="card">
++        <div className="card v2-card-lift v2-anim v2-d2">
+           <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '1.25rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+             <KeyRound size={20} />
+-            <span>Đổi Mật Khẩu</span>
++            <span>Đổi mật khẩu</span>
+           </h3>
+ 
+           <form onSubmit={handlePasswordSubmit}>
+@@ -150,7 +150,7 @@ export const Profile = ({ user, onUpdateUser }) => {
+               <input
+                 type="password"
+                 className="form-input"
+-                placeholder="Tối thiểu 6 ký tự"
++                placeholder="Ít nhất 6 ký tự"
+                 value={passwordData.newPassword}
+                 onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                 required
+@@ -171,7 +171,7 @@ export const Profile = ({ user, onUpdateUser }) => {
+ 
+             <button type="submit" className="btn btn-outline" style={{ width: '100%', marginTop: '1.8rem' }}>
+               <ShieldCheck size={18} />
+-              <span>Cập nhật Mật khẩu</span>
++              <span>Đổi mật khẩu</span>
+             </button>
+           </form>
+         </div>

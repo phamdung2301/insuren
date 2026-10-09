@@ -85,6 +85,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/policies/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.PUT, "/policies/**").hasRole("ADMIN")
 
+                        // ─── 9b. USER + ADMIN: Claims (ownership enforced in service layer)
+                        .requestMatchers("/claims/**").hasAnyRole("ADMIN", "USER")
+
                         // ─── 10. Catch-all: Require authentication ────────────────────────
                         .anyRequest().authenticated()
                 )

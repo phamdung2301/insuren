@@ -374,3 +374,95 @@ input, select, textarea {
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .navbar-inner { flex-direction: column; gap: 1rem; }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   INSUREN UI v2 — modern motion layer (append-only, 2026-10-09)
+   Không sửa style cũ bên trên. Tôn trọng prefers-reduced-motion.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ---------- keyframes ---------- */
+@keyframes v2-fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes v2-floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+@keyframes v2-blobMove { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -24px) scale(1.08); } 66% { transform: translate(-24px, 18px) scale(0.94); } }
+@keyframes v2-pulseRing { 0% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.45); } 70% { box-shadow: 0 0 0 12px rgba(13, 148, 136, 0); } 100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); } }
+@keyframes v2-shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+@keyframes v2-gradShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+@keyframes v2-marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes v2-barGrow { from { width: 0; } }
+@keyframes v2-spinSlow { to { transform: rotate(360deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- entrance ---------- */
+.v2-anim { animation: v2-fadeUp 0.55s cubic-bezier(0.22, 0.8, 0.32, 1) both; }
+.v2-d1 { animation-delay: 0.05s; } .v2-d2 { animation-delay: 0.14s; } .v2-d3 { animation-delay: 0.23s; }
+.v2-d4 { animation-delay: 0.32s; } .v2-d5 { animation-delay: 0.41s; } .v2-d6 { animation-delay: 0.5s; }
+
+/* ---------- decorative ---------- */
+.v2-blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.5; animation: v2-blobMove 12s ease-in-out infinite; pointer-events: none; }
+.v2-grad-text { background: linear-gradient(90deg, #1e3a8a, #6366f1, #0d9488, #1e3a8a); background-size: 300% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: v2-gradShift 6s ease infinite; }
+.v2-float { animation: v2-floaty 5s ease-in-out infinite; }
+.v2-glass { background: rgba(255, 255, 255, 0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.6); }
+
+/* ---------- hero banner ---------- */
+.v2-hero { position: relative; overflow: hidden; border-radius: var(--radius-lg); padding: 1.75rem 2rem; color: #fff;
+  background: linear-gradient(120deg, #1e3a8a, #3730a3 55%, #0d9488 135%); box-shadow: var(--shadow-md); }
+.v2-hero h1, .v2-hero h2 { color: #fff; }
+.v2-hero p { color: #dbeafe; }
+
+/* ---------- KPI card ---------- */
+.v2-kpi { position: relative; overflow: hidden; background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.15rem 1.3rem; box-shadow: var(--shadow-sm); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.v2-kpi:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.v2-kpi::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--kpi-c1, var(--primary)), var(--kpi-c2, var(--accent))); }
+.v2-kpi .v2-kpi-label { font-size: 0.72rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.v2-kpi .v2-kpi-value { font-size: 1.6rem; font-weight: 800; margin-top: 0.25rem; font-variant-numeric: tabular-nums; }
+.v2-kpi .v2-kpi-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem; }
+
+/* ---------- animated bars ---------- */
+.v2-bar-track { flex: 1; height: 10px; background: #eef2f7; border-radius: 99px; overflow: hidden; min-width: 60px; }
+.v2-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+  background-size: 200% 100%; animation: v2-barGrow 1s cubic-bezier(0.22, 0.8, 0.32, 1) both, v2-gradShift 4s linear 1s infinite; }
+
+/* ---------- card lift ---------- */
+.v2-card-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.v2-card-lift:hover { transform: translateY(-4px); box-shadow: 0 14px 34px rgba(30, 58, 138, 0.14); }
+
+/* ---------- ACTIVE badge pulse (additive, old classes untouched) ---------- */
+.status-ACTIVE.v2-pulse { animation: v2-pulseRing 2.4s infinite; }
+
+/* ---------- stepper v2 ---------- */
+.v2-step-line { flex: 1; height: 4px; border-radius: 3px; margin: 18px 0.7rem 0; min-width: 30px; background: var(--border); position: relative; overflow: hidden; align-self: flex-start; }
+.v2-step-line.done { background: var(--secondary); }
+.v2-step-line.done::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent);
+  background-size: 200% 100%; animation: v2-shimmer 1.8s infinite; }
+.v2-step-dot-active { animation: v2-pulseRing 2s infinite; }
+
+/* ---------- avatar gradient ring ---------- */
+.v2-avatar-ring { width: 96px; height: 96px; border-radius: 50%; padding: 4px; margin: 0 auto 0.9rem;
+  background: conic-gradient(from 0deg, #6366f1, #0d9488, #6366f1); animation: v2-spinSlow 6s linear infinite; }
+.v2-avatar-ring > div { width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 800; font-size: 1.9rem; background: linear-gradient(135deg, #1e3a8a, #3730a3); }
+
+/* ---------- marquee ---------- */
+.v2-marquee { overflow: hidden; white-space: nowrap;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
+.v2-marquee-track { display: inline-flex; gap: 2.4rem; animation: v2-marquee 22s linear infinite; }
+
+/* ---------- login split layout ---------- */
+.v2-login-wrap { display: flex; align-items: stretch; justify-content: center; gap: 1.5rem; width: 100%; max-width: 980px; margin: 0 auto; padding: 1rem; }
+.v2-login-brand { flex: 1.1; border-radius: var(--radius-xl); overflow: hidden; position: relative; color: #fff; min-height: 480px;
+  display: flex; flex-direction: column; justify-content: center; padding: 2.5rem;
+  background: linear-gradient(135deg, #0f1e4d 0%, #1e3a8a 45%, #0d9488 135%); box-shadow: var(--shadow-lg); }
+.v2-login-form { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+@media (max-width: 860px) { .v2-login-brand { display: none; } }
+
+/* ---------- accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .v2-anim, .v2-float, .v2-blob, .v2-grad-text, .v2-bar-fill, .v2-marquee-track,
+  .v2-avatar-ring, .status-ACTIVE.v2-pulse, .v2-step-line.done::after, .v2-step-dot-active {
+    animation: none !important;
+  }
+  .v2-bar-fill { width: var(--v2-w, 50%) !important; }
+}

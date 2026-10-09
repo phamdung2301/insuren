@@ -12,5 +12,6 @@ public enum TransactionType {
     UPDATE_COVERAGE,
     REMOVE_COVERAGE,
     CANCEL_POLICY,
-    EXPIRE_POLICY
+    EXPIRE_POLICY,
+    RENEW_POLICY
 }

@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BarChart2, PieChart, TrendingUp, Award, RefreshCw, DollarSign, Users, Layers, ShieldCheck, CheckCircle, Download, Upload, Table } from 'lucide-react';
+import { BarChart2, PieChart, Award, RefreshCw, DollarSign, Download, Upload, Table } from 'lucide-react';
 import reportApi from '../api/reportApi';
 import StatusBadge from '../components/StatusBadge';
+import PageHeader from '../components/PageHeader';
+import KpiCard from '../components/KpiCard';
+import AnimatedBar from '../components/AnimatedBar';
 import { Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 
@@ -31,7 +34,7 @@ export const AdminDashboard = () => {
       setTopPolicies(topRes || []);
       setMonthlyPremiums(mRes || []);
     } catch (err) {
-      console.error('Lỗi tải báo cáo từ MongoDB Aggregation', err);
+      console.error('Không tải được báo cáo', err);
     } finally {
       setLoading(false);
     }
@@ -63,7 +66,7 @@ export const AdminDashboard = () => {
       link.click();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      alert('Lỗi tải Excel template: ' + err.message);
+      alert('Không tải được file mẫu Excel: ' + err.message);
     } finally {
       setRatesLoading(false);
     }
@@ -80,10 +83,10 @@ export const AdminDashboard = () => {
       const res = await axiosClient.post('/excel/import-rates', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      setImportMsg(`✅ Đã cập nhật ${Object.keys(res || {}).length} tỷ lệ phí thành công!`);
+      setImportMsg(`Đã cập nhật ${Object.keys(res || {}).length} tỷ lệ phí ✓`);
       fetchCurrentRates();
     } catch (err) {
-      setImportMsg('❌ Lỗi import: ' + err.message);
+      setImportMsg('Không nhập được file: ' + err.message);
     } finally {
       setRatesLoading(false);
       e.target.value = '';
@@ -96,93 +99,58 @@ export const AdminDashboard = () => {
 
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-      {/* Top Banner Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)' }}>Trung Tâm Báo Cáo Phân Tích Kế Toán Bảo Hiểm</h1>
-          <p style={{ color: 'var(--text-muted)' }}>4 MongoDB Aggregation Pipelines xử lý trực tiếp trên tập dữ liệu lớn (Thống kê P09 & P10)</p>
-        </div>
-        <button onClick={fetchReports} className="btn btn-primary" style={{ padding: '0.6rem 1.25rem' }}>
-          <RefreshCw size={18} />
-          <span>Thực Thi Aggregation Pipelines</span>
-        </button>
-      </div>
+      <PageHeader
+        title="Báo cáo tổng hợp"
+        subtitle="Số liệu tính trực tiếp từ hệ thống, cập nhật theo thời gian thực"
+        delay="v2-d1"
+        actions={
+          <button onClick={fetchReports} className="btn" style={{ background: '#fff', color: 'var(--primary)', padding: '0.6rem 1.25rem', fontWeight: 700, borderRadius: 12, display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <RefreshCw size={18} />
+            <span>Tải lại báo cáo</span>
+          </button>
+        }
+      />
 
       {/* KPI Overview Summary Cards */}
       <div className="grid-4" style={{ marginBottom: '2rem' }}>
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div className="user-avatar" style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary)', width: 50, height: 50 }}>
-            <Layers size={24} />
-          </div>
-          <div>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Tổng Số Đơn Bảo Hiểm</span>
-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)' }}>
-              {totalOverallCount.toLocaleString()} hợp đồng
-            </div>
-          </div>
-        </div>
-
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div className="user-avatar" style={{ backgroundColor: 'var(--secondary-light)', color: 'var(--secondary)', width: 50, height: 50 }}>
-            <DollarSign size={24} />
-          </div>
-          <div>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Tổng Phí Bảo Hiểm Ghi Nhận</span>
-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--secondary)' }}>
-              ${totalOverallPremium.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
-            </div>
-          </div>
-        </div>
-
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div className="user-avatar" style={{ backgroundColor: 'var(--accent-light)', color: 'var(--accent)', width: 50, height: 50 }}>
-            <TrendingUp size={24} />
-          </div>
-          <div>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Số Đơn Đang Hiệu Lực</span>
-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent)' }}>
-              {(statusCounts.find(s => s.status === 'ACTIVE')?.count || 0).toLocaleString()} đơn ACTIVE
-            </div>
-          </div>
-        </div>
-
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div className="user-avatar" style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary)', width: 50, height: 50 }}>
-            <Award size={24} />
-          </div>
-          <div>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Hợp Đồng Giá Trị Nhất</span>
-            <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary)' }}>
-              ${(topPolicies[0]?.totalPremium || 0).toLocaleString()} USD
-            </div>
-          </div>
-        </div>
+        <KpiCard label="Tổng số hợp đồng" delay="v2-d2"
+          value={<>{totalOverallCount.toLocaleString()} <span style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-muted)' }}>hợp đồng</span></>}
+          sub="Tất cả trạng thái" colors={['#1e3a8a', '#6366f1']} />
+        <KpiCard label="Tổng phí đã ghi nhận" delay="v2-d3"
+          value={<span style={{ color: 'var(--secondary)' }}>${totalOverallPremium.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span style={{ fontSize: '1rem', fontWeight: 600 }}>USD</span></span>}
+          sub="Cộng dồn theo thời gian" colors={['#0d9488', '#14b8a6']} />
+        <KpiCard label="Số hợp đồng đang hiệu lực" delay="v2-d4"
+          value={<>{(statusCounts.find(s => s.status === 'ACTIVE')?.count || 0).toLocaleString()} <span style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-muted)' }}>hợp đồng</span></>}
+          sub="Trạng thái đang hiệu lực" colors={['#047857', '#10b981']} />
+        <KpiCard label="Hợp đồng giá trị nhất" delay="v2-d5"
+          value={<>${(topPolicies[0]?.totalPremium || 0).toLocaleString()} <span style={{ fontSize: '1rem', fontWeight: 600 }}>USD</span></>}
+          sub={topPolicies[0]?.policyNumber || 'Chưa có dữ liệu'} colors={['#b45309', '#f59e0b']} />
       </div>
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
           <RefreshCw size={32} style={{ animation: 'spin 1s linear infinite', marginBottom: '1rem' }} />
-          <p>Đang xử lý MongoDB Aggregation Pipeline ($group, $match, $sort, $limit)...</p>
+          <p>Đang tổng hợp số liệu...</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           {/* Section 1 & 2 Grid: Count by Status & Premium by Status */}
           <div className="grid-2">
             {/* Report 1: Count by Status */}
-            <div className="card">
+            <div className="card v2-card-lift v2-anim">
               <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <PieChart size={20} />
-                <span>1. Số Lượng Đơn Theo Trạng Thái Vòng Đời</span>
+                <span>1. Số hợp đồng theo trạng thái</span>
               </h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Pipeline `$group` gom nhóm theo `status` và tính `$sum: 1`</p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Số hợp đồng phân bổ theo từng trạng thái</p>
 
               <div className="table-container">
                 <table className="custom-table">
                   <thead>
                     <tr>
-                      <th>Trạng Thái Vòng Đời</th>
-                      <th>Số Lượng Đơn</th>
-                      <th>Tỷ Lệ Phần Trăm</th>
+                      <th>Trạng thái</th>
+                      <th>Số lượng</th>
+                      <th>Tỷ lệ %</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -191,14 +159,9 @@ export const AdminDashboard = () => {
                       return (
                         <tr key={sc.status}>
                           <td><StatusBadge status={sc.status} /></td>
-                          <td><strong style={{ fontSize: '1.05rem', color: 'var(--primary)' }}>{sc.count?.toLocaleString()}</strong> đơn</td>
-                          <td>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                              <div style={{ flex: 1, height: 8, backgroundColor: 'var(--border)', borderRadius: 4, overflow: 'hidden' }}>
-                                <div style={{ width: `${pct}%`, height: '100%', backgroundColor: 'var(--primary)' }} />
-                              </div>
-                              <span style={{ fontSize: '0.8rem', width: 45, fontWeight: 700 }}>{pct}%</span>
-                            </div>
+                          <td><strong style={{ fontSize: '1.05rem', color: 'var(--primary)' }}>{sc.count?.toLocaleString()}</strong> hợp đồng</td>
+                          <td style={{ minWidth: 220 }}>
+                            <AnimatedBar percent={pct} value={`${pct}%`} />
                           </td>
                         </tr>
                       );
@@ -209,20 +172,20 @@ export const AdminDashboard = () => {
             </div>
 
             {/* Report 2: Total Premium by Status */}
-            <div className="card">
+            <div className="card v2-card-lift v2-anim">
               <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <DollarSign size={20} />
-                <span>2. Tổng Phí Bảo Hiểm Doanh Thu Theo Trạng Thái</span>
+                <span>2. Tổng phí theo trạng thái</span>
               </h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Pipeline `$group` tổng hợp tích lũy `$sum: "$totalPremium"`</p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Tổng phí và phí trung bình theo trạng thái</p>
 
               <div className="table-container">
                 <table className="custom-table">
                   <thead>
                     <tr>
-                      <th>Trạng Thái Vòng Đời</th>
-                      <th>Tổng Phí Bảo Hiểm</th>
-                      <th>Trung Bình / Đơn</th>
+                      <th>Trạng thái</th>
+                      <th>Tổng phí</th>
+                      <th>Trung bình / hợp đồng</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -245,21 +208,21 @@ export const AdminDashboard = () => {
           {/* Section 3 & 4 Grid: Top 5 Policies & Monthly Revenues */}
           <div className="grid-2">
             {/* Report 3: Top 5 Highest Premium Policies */}
-            <div className="card">
+            <div className="card v2-card-lift v2-anim">
               <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Award size={20} />
-                <span>3. Top 5 Hợp Đồng Bảo Hiểm Phí Khủng Nhất</span>
+                <span>3. Top 5 hợp đồng phí cao nhất</span>
               </h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Pipeline `$sort: totalPremium DESC` kết hợp `$limit: 5`</p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Các hợp đồng có tổng phí cao nhất</p>
 
               <div className="table-container">
                 <table className="custom-table">
                   <thead>
                     <tr>
-                      <th>Hạng</th>
-                      <th>Mã Hợp Đồng</th>
-                      <th>Bên Mua Bảo Hiểm</th>
-                      <th>Tổng Phí Quy Đổi</th>
+                      <th>Top</th>
+                      <th>Số hợp đồng</th>
+                      <th>Bên mua</th>
+                      <th>Tổng phí quy đổi</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -283,20 +246,20 @@ export const AdminDashboard = () => {
             </div>
 
             {/* Report 4: Monthly Premium Breakdown */}
-            <div className="card">
+            <div className="card v2-card-lift v2-anim">
               <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <BarChart2 size={20} />
-                <span>4. Thống Kế Phí Theo Tháng Hiệu Lực (Monthly Trends)</span>
+                <span>4. Phí theo tháng hiệu lực</span>
               </h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Pipeline chiết xuất `$year` và `$month` từ `effectiveDate`</p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Tổng phí theo tháng hợp đồng có hiệu lực</p>
 
               <div className="table-container">
                 <table className="custom-table">
                   <thead>
                     <tr>
-                      <th>Tháng / Năm</th>
-                      <th>Số Lượng Hợp Đồng</th>
-                      <th>Tổng Doanh Thu Phí</th>
+                      <th>Tháng/Năm</th>
+                      <th>Số lượng hợp đồng</th>
+                      <th>Tổng phí</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -321,10 +284,10 @@ export const AdminDashboard = () => {
               <div>
                 <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   <Table size={22} />
-                  <span>5. Ma Trận Định Mức Tỷ Lệ Phí Bảo Hiểm (Excel In / Out Matrix)</span>
+                  <span>5. Bảng tỷ lệ phí (nhập/xuất Excel)</span>
                 </h3>
                 <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-                  Công cụ dành riêng cho Chuyên viên Định phí (Actuary): Xuất ma trận định phí Excel, hiệu chỉnh công thức/hệ số rủi ro, và nạp (import) vào hệ thống để áp dụng tức thì.
+                  Dành cho chuyên viên định phí: xuất bảng tỷ lệ ra Excel, chỉnh công thức và hệ số rồi tải lên để áp dụng ngay.
                 </p>
               </div>
 
@@ -336,7 +299,7 @@ export const AdminDashboard = () => {
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600 }}
                 >
                   <Download size={16} />
-                  <span>Xuất Ma Trận Excel (.xlsx)</span>
+                  <span>Tải bảng tỷ lệ (Excel)</span>
                 </button>
 
                 <input
@@ -354,7 +317,7 @@ export const AdminDashboard = () => {
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600 }}
                 >
                   <Upload size={16} />
-                  <span>Nạp File Excel Cập Nhật Tỷ Lệ</span>
+                  <span>Tải lên file Excel cập nhật tỷ lệ</span>
                 </button>
               </div>
             </div>
@@ -366,8 +329,8 @@ export const AdminDashboard = () => {
                 marginBottom: '1rem',
                 fontSize: '0.9rem',
                 fontWeight: 600,
-                backgroundColor: importMsg.startsWith('✅') ? 'var(--status-active-bg)' : 'var(--status-cancelled-bg)',
-                color: importMsg.startsWith('✅') ? 'var(--status-active-text)' : 'var(--status-cancelled-text)'
+                backgroundColor: importMsg.startsWith('Không') ? 'var(--status-cancelled-bg)' : 'var(--status-active-bg)',
+                color: importMsg.startsWith('Không') ? 'var(--status-cancelled-text)' : 'var(--status-active-text)'
               }}>
                 {importMsg}
               </div>
@@ -375,7 +338,7 @@ export const AdminDashboard = () => {
 
             <div style={{ background: 'var(--bg-main)', borderRadius: 'var(--radius-md)', padding: '1rem' }}>
               <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.75rem', textTransform: 'uppercase' }}>
-                Bảng Tỷ Lệ Cơ Sở (Base Rates) Hiện Hành Trên Bộ Nhớ Hệ Thống:
+                Bảng tỷ lệ phí đang áp dụng:
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.75rem' }}>
                 {Object.entries(currentRates).length > 0 ? (

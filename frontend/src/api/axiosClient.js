@@ -35,7 +35,7 @@ axiosClient.interceptors.response.use(
         message = message ? `${message} (${details})` : details;
       }
     }
-    return Promise.reject(new Error(message || error.message || 'Có lỗi kết nối hệ thống server'));
+    return Promise.reject(new Error(message || error.message || 'Không kết nối được máy chủ, bạn kiểm tra mạng và thử lại nhé'));
   }
 );
 

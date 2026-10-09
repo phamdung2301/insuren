@@ -52,6 +52,13 @@ public class PolicyController {
         return ResponseEntity.ok(ApiResponse.success(response, "Policies retrieved successfully"));
     }
 
+    @GetMapping("/expiring")
+    public ResponseEntity<ApiResponse<java.util.List<PolicyResponse>>> getExpiringPolicies(
+            @RequestParam(defaultValue = "30") int days) {
+        java.util.List<PolicyResponse> response = policyService.getExpiringPolicies(days);
+        return ResponseEntity.ok(ApiResponse.success(response, "Expiring policies retrieved successfully"));
+    }
+
     @GetMapping("/{policyNumber}")
     public ResponseEntity<ApiResponse<PolicyResponse>> getPolicyByNumber(@PathVariable String policyNumber) {
         PolicyResponse response = policyService.getPolicyByNumber(policyNumber);
@@ -157,6 +164,20 @@ public class PolicyController {
             @Valid @RequestBody com.dungphd.insurance.dto.request.EndorsementRequest request) {
         PolicyResponse response = policyService.endorsePolicy(policyNumber, request);
         return ResponseEntity.ok(ApiResponse.success(response, "Policy endorsed successfully, new version created"));
+    }
+
+    // ==========================================
+    // Feature: Renewal (tái tục hợp đồng)
+    // ==========================================
+
+    @PostMapping("/{policyNumber}/renew")
+    public ResponseEntity<ApiResponse<PolicyResponse>> renewPolicy(@PathVariable String policyNumber) {
+        org.springframework.security.core.Authentication auth =
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        String actor = (auth != null && auth.getName() != null) ? auth.getName() : "System";
+        PolicyResponse response = policyService.renewPolicy(policyNumber, actor);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(response, "Policy renewed successfully, new draft created"));
     }
 
     // ==========================================

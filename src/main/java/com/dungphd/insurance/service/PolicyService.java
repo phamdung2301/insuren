@@ -49,4 +49,8 @@ public interface PolicyService {
     java.util.List<com.dungphd.insurance.dto.response.PolicyTransactionResponse> getPolicyHistory(String policyNumber);
     java.util.List<com.dungphd.insurance.dto.response.PolicyVersionResponse> getAllPolicyVersions(String policyNumber);
     com.dungphd.insurance.dto.response.PolicyVersionResponse getPolicyVersion(String policyNumber, Integer version);
+
+    // Feature: Renewal (tái tục hợp đồng)
+    PolicyResponse renewPolicy(String policyNumber, String actor);
+    java.util.List<PolicyResponse> getExpiringPolicies(int days);
 }

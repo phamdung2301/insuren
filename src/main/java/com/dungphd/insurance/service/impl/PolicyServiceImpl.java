@@ -669,6 +669,132 @@ public class PolicyServiceImpl implements PolicyService {
         return mapToPolicyResponse(saved);
     }
 
+    // ==========================================
+    // Feature: Renewal (tái tục hợp đồng)
+    // ==========================================
+
+    @Override
+    public PolicyResponse renewPolicy(String policyNumber, String actor) {
+        Policy oldPolicy = policyRepository.findByPolicyNumber(policyNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Policy not found with number: " + policyNumber));
+
+        if (oldPolicy.getStatus() != PolicyStatus.ACTIVE && oldPolicy.getStatus() != PolicyStatus.EXPIRED) {
+            throw new InvalidRequestException("Only ACTIVE or EXPIRED policies can be renewed. Policy "
+                    + policyNumber + " is currently " + oldPolicy.getStatus() + ".");
+        }
+
+        String newPolicyNumber = generatePolicyNumber();
+        Instant now = Instant.now();
+        Instant newEffective = (oldPolicy.getExpirationDate() != null && oldPolicy.getExpirationDate().isAfter(now))
+                ? oldPolicy.getExpirationDate()
+                : now;
+        Instant newExpiration = newEffective.plus(365, java.time.temporal.ChronoUnit.DAYS);
+
+        // Deep-copy locations & coverages (locationId mới để tránh trùng)
+        List<Location> newLocations = oldPolicy.getLocations() != null
+                ? oldPolicy.getLocations().stream()
+                        .map(loc -> Location.builder()
+                                .locationId("LOC-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase())
+                                .address(loc.getAddress())
+                                .coverages(loc.getCoverages() != null
+                                        ? loc.getCoverages().stream()
+                                                .map(cov -> Coverage.builder()
+                                                        .coverageCode(cov.getCoverageCode())
+                                                        .coverageName(cov.getCoverageName())
+                                                        .coverageType(cov.getCoverageType())
+                                                        .limit(cov.getLimit())
+                                                        .deductible(cov.getDeductible())
+                                                        .termMonths(cov.getTermMonths())
+                                                        .baseRate(cov.getBaseRate())
+                                                        .premium(cov.getPremium())
+                                                        .build())
+                                                .collect(Collectors.toList())
+                                        : new ArrayList<>())
+                                .build())
+                        .collect(Collectors.toList())
+                : new ArrayList<>();
+
+        Insured oldInsured = oldPolicy.getInsured();
+        Insured newInsured = oldInsured != null ? Insured.builder()
+                .insuredId(oldInsured.getInsuredId())
+                .name(oldInsured.getName())
+                .type(oldInsured.getType())
+                .email(oldInsured.getEmail())
+                .phone(oldInsured.getPhone())
+                .address(oldInsured.getAddress())
+                .build() : null;
+
+        Policy renewed = Policy.builder()
+                .policyNumber(newPolicyNumber)
+                .status(PolicyStatus.DRAFT)
+                .insured(newInsured)
+                .locations(newLocations)
+                .effectiveDate(newEffective)
+                .expirationDate(newExpiration)
+                .version(1)
+                .renewedFromPolicyNumber(oldPolicy.getPolicyNumber())
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+        renewed.recalculateTotalPremium();
+        Policy saved = policyRepository.save(renewed);
+
+        // Snapshot V1 cho HĐ mới
+        PolicyVersion initSnapshot = PolicyVersion.builder()
+                .policyNumber(saved.getPolicyNumber())
+                .version(1)
+                .policySnapshot(saved)
+                .createdBy(actor != null ? actor : "System")
+                .createdAt(Instant.now())
+                .build();
+        policyVersionRepository.save(initSnapshot);
+
+        // Ghi transaction cho cả 2 HĐ
+        recordTxnWithActor(saved.getPolicyNumber(), 1, TransactionType.RENEW_POLICY,
+                "Renewed from policy " + oldPolicy.getPolicyNumber() + ". New draft created.", actor);
+        recordTxnWithActor(oldPolicy.getPolicyNumber(), oldPolicy.getVersion(), TransactionType.RENEW_POLICY,
+                "Policy renewed into new draft " + saved.getPolicyNumber() + ".", actor);
+
+        return mapToPolicyResponse(saved);
+    }
+
+    @Override
+    public java.util.List<PolicyResponse> getExpiringPolicies(int days) {
+        int d = Math.max(days, 1);
+        Instant now = Instant.now();
+        Instant cutoff = now.plus(d, java.time.temporal.ChronoUnit.DAYS);
+        Criteria criteria = new Criteria().andOperator(
+                Criteria.where("status").is(PolicyStatus.ACTIVE),
+                Criteria.where("expirationDate").gte(now).lte(cutoff));
+        Query query = Query.query(criteria).with(Sort.by(Sort.Direction.ASC, "expirationDate"));
+        return mongoTemplate.find(query, Policy.class).stream()
+                .map(this::mapToPolicyResponse)
+                .collect(Collectors.toList());
+    }
+
+    private String generatePolicyNumber() {
+        String number;
+        int year = java.time.LocalDate.now().getYear();
+        do {
+            number = String.format("POL-%d-%06d", year,
+                    java.util.concurrent.ThreadLocalRandom.current().nextInt(100000, 999999));
+        } while (policyRepository.existsByPolicyNumber(number));
+        return number;
+    }
+
+    private void recordTxnWithActor(String policyNumber, Integer version, TransactionType type,
+                                    String description, String actor) {
+        PolicyTransaction txn = PolicyTransaction.builder()
+                .policyNumber(policyNumber)
+                .version(version)
+                .transactionType(type)
+                .actor(actor != null ? actor : "System")
+                .description(description)
+                .timestamp(Instant.now())
+                .build();
+        policyTransactionRepository.save(txn);
+    }
+
     private PolicyResponse mapToPolicyResponse(Policy policy) {
         return PolicyResponse.builder()
                 .id(policy.getId())

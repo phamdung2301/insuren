@@ -20,34 +20,34 @@ export const Profile = ({ user, onUpdateUser }) => {
   const handleProfileSubmit = (e) => {
     e.preventDefault();
     onUpdateUser({ ...user, ...formData });
-    setMessage({ type: 'success', text: 'Cập nhật thông tin cá nhân thành công!' });
+    setMessage({ type: 'success', text: 'Đã lưu thông tin cá nhân ✓' });
     setTimeout(() => setMessage({ type: '', text: '' }), 4000);
   };
 
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
     if (passwordData.newPassword.length < 6) {
-      setMessage({ type: 'error', text: 'Mật khẩu mới phải có tối thiểu 6 ký tự' });
+      setMessage({ type: 'error', text: 'Mật khẩu mới cần ít nhất 6 ký tự' });
       return;
     }
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setMessage({ type: 'error', text: 'Xác nhận mật khẩu mới không khớp' });
+      setMessage({ type: 'error', text: 'Hai lần nhập chưa khớp nhau, bạn kiểm tra lại nhé' });
       return;
     }
-    setMessage({ type: 'success', text: 'Đổi mật khẩu thành công!' });
+    setMessage({ type: 'success', text: 'Đổi mật khẩu thành công ✓' });
     setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
     setTimeout(() => setMessage({ type: '', text: '' }), 4000);
   };
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto' }}>
-      <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <div className="user-avatar" style={{ width: 64, height: 64, fontSize: '1.5rem' }}>
-          {formData.fullName ? formData.fullName.charAt(0).toUpperCase() : 'U'}
+      <div className="v2-anim v2-d1" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div className="v2-avatar-ring v2-anim">
+          <div>{formData.fullName ? formData.fullName.charAt(0).toUpperCase() : 'U'}</div>
         </div>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)' }}>Trang Cá Nhân</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Quản lý thông tin tài khoản và an toàn bảo mật</p>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)' }}>Hồ sơ cá nhân</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Quản lý thông tin tài khoản và bảo mật</p>
         </div>
       </div>
 
@@ -69,15 +69,15 @@ export const Profile = ({ user, onUpdateUser }) => {
 
       <div className="grid-2">
         {/* Profile Info Form */}
-        <div className="card">
+        <div className="card v2-card-lift v2-anim v2-d2">
           <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '1.25rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <User size={20} />
-            <span>Thông tin Cá nhân</span>
+            <span>Thông tin cá nhân</span>
           </h3>
 
           <form onSubmit={handleProfileSubmit}>
             <div className="form-group">
-              <label className="form-label">Họ và Tên</label>
+              <label className="form-label">Họ và tên</label>
               <input
                 type="text"
                 className="form-input"
@@ -88,7 +88,7 @@ export const Profile = ({ user, onUpdateUser }) => {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Địa chỉ Gmail</label>
+              <label className="form-label">Email</label>
               <input
                 type="email"
                 className="form-input"
@@ -120,16 +120,16 @@ export const Profile = ({ user, onUpdateUser }) => {
 
             <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
               <Save size={18} />
-              <span>Lưu Thông tin</span>
+              <span>Lưu thay đổi</span>
             </button>
           </form>
         </div>
 
         {/* Change Password Form */}
-        <div className="card">
+        <div className="card v2-card-lift v2-anim v2-d2">
           <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '1.25rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <KeyRound size={20} />
-            <span>Đổi Mật Khẩu</span>
+            <span>Đổi mật khẩu</span>
           </h3>
 
           <form onSubmit={handlePasswordSubmit}>
@@ -150,7 +150,7 @@ export const Profile = ({ user, onUpdateUser }) => {
               <input
                 type="password"
                 className="form-input"
-                placeholder="Tối thiểu 6 ký tự"
+                placeholder="Ít nhất 6 ký tự"
                 value={passwordData.newPassword}
                 onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                 required
@@ -171,7 +171,7 @@ export const Profile = ({ user, onUpdateUser }) => {
 
             <button type="submit" className="btn btn-outline" style={{ width: '100%', marginTop: '1.8rem' }}>
               <ShieldCheck size={18} />
-              <span>Cập nhật Mật khẩu</span>
+              <span>Đổi mật khẩu</span>
             </button>
           </form>
         </div>

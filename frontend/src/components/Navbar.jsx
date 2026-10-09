@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShieldCheck, FileText, ShoppingBag, User, BarChart2, Cpu, LogOut, ChevronDown, Settings } from 'lucide-react';
+import { ShieldCheck, FileText, ShoppingBag, User, BarChart2, Cpu, LogOut, ChevronDown, Settings, FileWarning } from 'lucide-react';
 
 export const Navbar = ({ user, onLogout, isAdmin }) => {
   const location = useLocation();
@@ -25,13 +25,19 @@ export const Navbar = ({ user, onLogout, isAdmin }) => {
               <li>
                 <Link to="/my-policies" className={`nav-item ${isActive('/my-policies')}`}>
                   <FileText size={18} />
-                  <span>{isAdmin ? 'Quản Lý Đơn BH' : 'Hợp đồng của tôi'}</span>
+                  <span>{isAdmin ? 'Quản lý hợp đồng' : 'Hợp đồng của tôi'}</span>
                 </Link>
               </li>
               <li>
                 <Link to="/buy" className={`nav-item ${isActive('/buy')}`}>
                   <ShoppingBag size={18} />
-                  <span>Mua Bảo Hiểm</span>
+                  <span>Mua bảo hiểm</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/claims" className={`nav-item ${isActive('/claims')}`}>
+                  <FileWarning size={18} />
+                  <span>Bồi thường</span>
                 </Link>
               </li>
             </>
@@ -46,7 +52,7 @@ export const Navbar = ({ user, onLogout, isAdmin }) => {
                 style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
               >
                 <Settings size={18} />
-                <span>Quản Trị</span>
+                <span>Quản trị</span>
                 <ChevronDown size={14} style={{ transform: adminMenuOpen ? 'rotate(180deg)' : 'rotate(0)', transition: '0.2s' }} />
               </button>
 
@@ -72,7 +78,7 @@ export const Navbar = ({ user, onLogout, isAdmin }) => {
                       onClick={() => setAdminMenuOpen(false)}
                     >
                       <BarChart2 size={16} />
-                      <span>Báo Cáo Thống Kê</span>
+                      <span>Báo cáo</span>
                     </Link>
                   </li>
                   <li>
@@ -83,7 +89,7 @@ export const Navbar = ({ user, onLogout, isAdmin }) => {
                       onClick={() => setAdminMenuOpen(false)}
                     >
                       <Cpu size={16} />
-                      <span>Benchmark 50k</span>
+                      <span>Kiểm tra hiệu năng</span>
                     </Link>
                   </li>
                 </ul>
@@ -140,7 +146,7 @@ export const Navbar = ({ user, onLogout, isAdmin }) => {
           ) : (
             <Link to="/login" className="btn btn-primary">
               <User size={18} />
-              <span>Đăng Nhập</span>
+              <span>Đăng nhập</span>
             </Link>
           )}
         </div>

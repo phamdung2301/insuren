@@ -212,17 +212,17 @@ export const BuyInsurance = ({ user }) => {
 
   // Step 1 validation
   const validateStep1 = () => {
-    if (!insuredInfo.name.trim()) return 'Vui lòng nhập tên Bên mua bảo hiểm';
-    if (!insuredInfo.email.trim() || !insuredInfo.email.includes('@')) return 'Địa chỉ Gmail không hợp lệ';
-    if (!insuredInfo.phone.trim()) return 'Vui lòng nhập số điện thoại liên hệ';
-    if (locations.length === 0) return 'Vui lòng khai báo ít nhất 01 địa điểm bảo hiểm';
+    if (!insuredInfo.name.trim()) return 'Bạn nhập tên bên mua bảo hiểm nhé';
+    if (!insuredInfo.email.trim() || !insuredInfo.email.includes('@')) return 'Email chưa đúng định dạng, bạn kiểm tra lại nhé';
+    if (!insuredInfo.phone.trim()) return 'Bạn nhập số điện thoại liên hệ nhé';
+    if (locations.length === 0) return 'Bạn khai báo ít nhất 1 địa điểm nhé';
     for (let i = 0; i < locations.length; i++) {
       if (!locations[i].address.trim()) {
         return `Vui lòng nhập địa chỉ cụ thể cho ${locations[i].name || `Địa điểm ${i + 1}`}`;
       }
     }
     const effDate = new Date(effectiveDateStr);
-    if (effDate <= new Date()) return 'Ngày hiệu lực phải từ ngày mai trở đi';
+    if (effDate <= new Date()) return 'Bạn chọn ngày hiệu lực từ ngày mai trở đi nhé';
     return null;
   };
 
@@ -236,7 +236,7 @@ export const BuyInsurance = ({ user }) => {
   const handleNextStep2 = async () => {
     const activeCovs = selectedCoverages.filter((c) => c.selected);
     if (activeCovs.length === 0) {
-      setErrorMsg('Vui lòng chọn ít nhất 01 gói quyền lợi bảo hiểm');
+      setErrorMsg('Bạn chọn ít nhất 1 gói quyền lợi nhé');
       return;
     }
     setErrorMsg('');
@@ -262,7 +262,7 @@ export const BuyInsurance = ({ user }) => {
       }));
 
     if (activeCoverages.length === 0) {
-      setErrorMsg('Vui lòng chọn ít nhất một gói quyền lợi bảo hiểm');
+      setErrorMsg('Bạn chọn ít nhất 1 gói quyền lợi nhé');
       setLoading(false);
       return;
     }
@@ -307,7 +307,7 @@ export const BuyInsurance = ({ user }) => {
         try {
           await policyApi.transitionStatus(policyNum, {
             targetStatus: 'QUOTED',
-            reason: 'Đã hoàn tất tính phí và tạo bản báo giá chính thức từ bảng quyền lợi',
+            reason: 'Đã tính xong phí và tạo báo giá chính thức',
             actor: insuredInfo.name?.trim() || 'Khách hàng',
           });
         } catch (transErr) {
@@ -317,7 +317,7 @@ export const BuyInsurance = ({ user }) => {
       navigate(`/policies/${policyNum}?created=true&mode=${asDraft ? 'draft' : 'quoted'}`);
     } catch (err) {
       console.error('Failed to create policy', err);
-      setErrorMsg(err.message || 'Không thể tạo đơn bảo hiểm. Vui lòng thử lại.');
+      setErrorMsg(err.message || 'Chưa tạo được hợp đồng, bạn thử lại nhé.');
     } finally {
       setLoading(false);
     }
@@ -340,29 +340,29 @@ export const BuyInsurance = ({ user }) => {
 
   const stepConfig = [
     { num: 1, label: 'Bên mua & Địa điểm' },
-    { num: 2, label: 'Chọn Quyền lợi' },
-    { num: 3, label: 'Bảng phí xác nhận' },
-    { num: 4, label: 'Nộp Hồ sơ' },
+    { num: 2, label: 'Chọn quyền lợi' },
+    { num: 3, label: 'Tóm tắt phí' },
+    { num: 4, label: 'Gửi yêu cầu' },
   ];
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto' }}>
       {/* Page Header */}
-      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+      <div className="v2-anim v2-d1" style={{ textAlign: 'center', marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--primary)' }}>
-          Yêu Cầu Cấp Đơn Bảo Hiểm Doanh Nghiệp
+          Mua bảo hiểm doanh nghiệp
         </h1>
         <p style={{ color: 'var(--text-muted)' }}>
-          Phí bảo hiểm được tính tự động theo bảng định mức nghiệp vụ — Hoàn tất trong 4 bước
+          Phí tính tự động theo bảng giá — chỉ 4 bước là xong
         </p>
       </div>
 
       {/* Step Indicator */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '0', marginBottom: '2.5rem' }}>
+      <div className="v2-anim v2-d2" style={{ display: 'flex', justifyContent: 'center', gap: '0', marginBottom: '2.5rem' }}>
         {stepConfig.map((s, idx) => (
           <React.Fragment key={s.num}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
-              <div style={{
+              <div className={step === s.num ? 'v2-step-dot-active' : ''} style={{
                 width: 44,
                 height: 44,
                 borderRadius: '50%',
@@ -379,7 +379,7 @@ export const BuyInsurance = ({ user }) => {
               </span>
             </div>
             {idx < stepConfig.length - 1 && (
-              <div style={{ flex: 1, height: 2, backgroundColor: step > s.num ? 'var(--secondary)' : 'var(--border)', alignSelf: 'flex-start', marginTop: 21, minWidth: 32, transition: 'all 0.3s' }} />
+              <div className={`v2-step-line ${step > s.num ? 'done' : ''}`} />
             )}
           </React.Fragment>
         ))}
@@ -393,30 +393,30 @@ export const BuyInsurance = ({ user }) => {
         </div>
       )}
 
-      <div className="card" style={{ padding: '2rem' }}>
+      <div className="card v2-anim v2-d3" style={{ padding: '2rem' }}>
 
         {/* ─── STEP 1: INSURED INFO ─── */}
         {step === 1 && (
           <div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <User size={22} />
-              <span>Bước 1: Thông Tin Bên Mua Bảo Hiểm & Địa Điểm</span>
+              <span>Bước 1: Thông tin bên mua & địa điểm</span>
             </h3>
 
             <div className="grid-2" style={{ marginBottom: '1.25rem' }}>
               <div className="form-group">
-                <label className="form-label">Loại Đối Tượng Được Bảo Hiểm <span style={{ color: 'red' }}>*</span></label>
+                <label className="form-label">Đối tượng được bảo hiểm <span style={{ color: 'red' }}>*</span></label>
                 <select
                   className="form-select"
                   value={insuredInfo.type}
                   onChange={(e) => setInsuredInfo({ ...insuredInfo, type: e.target.value })}
                 >
-                  <option value="BUSINESS">Doanh Nghiệp / Tổ Chức (BUSINESS)</option>
-                  <option value="INDIVIDUAL">Cá Nhân / Hộ Kinh Doanh (INDIVIDUAL)</option>
+                  <option value="BUSINESS">Doanh nghiệp / Tổ chức</option>
+                  <option value="INDIVIDUAL">Cá nhân / Hộ kinh doanh</option>
                 </select>
               </div>
               <div className="form-group">
-                <label className="form-label">Mã Định Danh Đối Tượng (Insured ID)</label>
+                <label className="form-label">Mã định danh</label>
                 <input
                   type="text"
                   className="form-input"
@@ -431,7 +431,7 @@ export const BuyInsurance = ({ user }) => {
                   value={insuredInfo.name} onChange={(e) => setInsuredInfo({ ...insuredInfo, name: e.target.value })} required />
               </div>
               <div className="form-group">
-                <label className="form-label">Gmail nhận Hợp đồng & thông báo <span style={{ color: 'red' }}>*</span></label>
+                <label className="form-label">Email nhận hợp đồng & thông báo <span style={{ color: 'red' }}>*</span></label>
                 <input type="email" className="form-input" placeholder="khachhang@gmail.com"
                   value={insuredInfo.email} onChange={(e) => setInsuredInfo({ ...insuredInfo, email: e.target.value })} required />
               </div>
@@ -441,14 +441,14 @@ export const BuyInsurance = ({ user }) => {
                   value={insuredInfo.phone} onChange={(e) => setInsuredInfo({ ...insuredInfo, phone: e.target.value })} required />
               </div>
               <div className="form-group">
-                <label className="form-label">Ngày bắt đầu hiệu lực bảo hiểm <span style={{ color: 'red' }}>*</span></label>
+                <label className="form-label">Ngày hiệu lực <span style={{ color: 'red' }}>*</span></label>
                 <input type="date" className="form-input" value={effectiveDateStr}
                   onChange={(e) => setEffectiveDateStr(e.target.value)} min={new Date(Date.now() + 86400000).toISOString().split('T')[0]} required />
               </div>
             </div>
 
             <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-              <label className="form-label">Địa chỉ Trụ sở chính Bên mua bảo hiểm</label>
+              <label className="form-label">Địa chỉ bên mua bảo hiểm</label>
               <input type="text" className="form-input" placeholder="123 Đường ABC, Phường XYZ, Q.1, TP.HCM"
                 value={insuredInfo.address} onChange={(e) => setInsuredInfo({ ...insuredInfo, address: e.target.value })} />
             </div>
@@ -459,10 +459,10 @@ export const BuyInsurance = ({ user }) => {
                 <div>
                   <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
                     <Building2 size={20} style={{ color: 'var(--primary)' }} />
-                    <span>Danh Sách Địa Điểm Cần Được Bảo Hiểm ({locations.length})</span>
+                    <span>Danh sách địa điểm được bảo hiểm ({locations.length})</span>
                   </h4>
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.25rem 0 0' }}>
-                    Khai báo các nhà xưởng, kho bãi, văn phòng chi nhánh thuộc phạm vi bảo hiểm của hợp đồng
+                    Khai báo nhà xưởng, kho bãi, văn phòng được bảo hiểm trong hợp đồng này
                   </p>
                 </div>
                 <button
@@ -481,7 +481,7 @@ export const BuyInsurance = ({ user }) => {
                   }}
                 >
                   <PlusCircle size={16} />
-                  <span>Thêm Địa Điểm</span>
+                  <span>Thêm địa điểm</span>
                 </button>
               </div>
 
@@ -541,7 +541,7 @@ export const BuyInsurance = ({ user }) => {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.75rem' }}>
                       <div>
                         <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
-                          Tên Định Danh / Vai Trò
+                          Tên hiển thị
                         </label>
                         <input
                           type="text"
@@ -554,7 +554,7 @@ export const BuyInsurance = ({ user }) => {
                       </div>
                       <div>
                         <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
-                          Địa Chỉ Rủi Ro Cụ Thể <span style={{ color: 'red' }}>*</span>
+                          Địa chỉ cụ thể <span style={{ color: 'red' }}>*</span>
                         </label>
                         <input
                           type="text"
@@ -580,14 +580,14 @@ export const BuyInsurance = ({ user }) => {
                     style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem', gap: '0.35rem' }}
                   >
                     <PlusCircle size={15} />
-                    <span>+ Thêm địa điểm rủi ro khác</span>
+                    <span>+ Thêm địa điểm khác</span>
                   </button>
                 </div>
               )}
             </div>
 
             <button onClick={handleNextStep1} className="btn btn-primary" style={{ width: '100%', padding: '0.85rem' }}>
-              <span>Tiếp Theo: Lựa Chọn Gói Quyền Lợi ({locations.length} Địa Điểm)</span>
+              <span>Tiếp theo: chọn quyền lợi ({locations.length} địa điểm)</span>
               <ArrowRight size={18} />
             </button>
           </div>
@@ -598,10 +598,10 @@ export const BuyInsurance = ({ user }) => {
           <div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <ShieldCheck size={22} />
-              <span>Bước 2: Lựa Chọn Gói Quyền Lợi & Điều Kiện Bảo Hiểm</span>
+              <span>Bước 2: Chọn quyền lợi bảo hiểm</span>
             </h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
-              Phí được tính theo công thức: <strong>Hạn mức × Tỷ lệ phí gốc × Hệ số thời hạn × Hệ số loại gói × Chiết khấu miễn trừ</strong>
+              Cách tính phí: <strong>Hạn mức × Tỷ lệ phí gốc × Hệ số thời hạn × Hệ số loại gói × Chiết khấu miễn thường</strong>
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
@@ -634,17 +634,17 @@ export const BuyInsurance = ({ user }) => {
                     <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
                         <div>
-                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Hạn Mức Bồi Thường Tối Đa ($USD)</label>
+                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Hạn mức bồi thường tối đa (USD)</label>
                           <input type="number" className="form-input" value={cov.limit} min={10000} step={10000}
                             onChange={(e) => updateCovField(cov.coverageCode, 'limit', Number(e.target.value))} />
                         </div>
                         <div>
-                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Mức Miễn Trừ Bảo Hiểm ($USD)</label>
+                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Mức miễn thường (USD)</label>
                           <input type="number" className="form-input" value={cov.deductible} min={0} step={500}
                             onChange={(e) => updateCovField(cov.coverageCode, 'deductible', Number(e.target.value))} />
                         </div>
                         <div>
-                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Loại Gói Bảo Hiểm</label>
+                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Loại gói bảo hiểm</label>
                           <select className="form-select" value={cov.coverageType}
                             onChange={(e) => updateCovField(cov.coverageCode, 'coverageType', e.target.value)}>
                             {COVERAGE_TYPES.map((t) => (
@@ -653,7 +653,7 @@ export const BuyInsurance = ({ user }) => {
                           </select>
                         </div>
                         <div>
-                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Thời Hạn Bảo Hiểm</label>
+                          <label className="form-label" style={{ fontSize: '0.78rem' }}>Thời hạn bảo hiểm</label>
                           <select className="form-select" value={cov.termMonths}
                             onChange={(e) => updateCovField(cov.coverageCode, 'termMonths', Number(e.target.value))}>
                             {TERM_OPTIONS.map((t) => (
@@ -676,7 +676,7 @@ export const BuyInsurance = ({ user }) => {
                 {calculating ? (
                   <><RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} /><span>Đang tính phí...</span></>
                 ) : (
-                  <><Calculator size={18} /><span>Xác Nhận & Tính Phí Chính Thức</span></>
+                  <><Calculator size={18} /><span>Xác nhận & tính phí chính thức</span></>
                 )}
               </button>
             </div>
@@ -688,12 +688,12 @@ export const BuyInsurance = ({ user }) => {
           <div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.25rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Calculator size={22} />
-              <span>Bước 3: Bảng Tổng Hợp Phí Bảo Hiểm Quy Chuẩn</span>
+              <span>Bước 3: Tóm tắt phí</span>
             </h3>
 
             {/* Total premium highlight */}
             <div style={{ padding: '1.75rem', background: 'linear-gradient(135deg, var(--primary) 0%, #1e40af 100%)', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', textAlign: 'center', color: 'white' }}>
-              <span style={{ fontSize: '0.85rem', opacity: 0.85, textTransform: 'uppercase', fontWeight: 700 }}>Tổng Phí Bảo Hiểm Toàn Bộ Hợp Đồng</span>
+              <span style={{ fontSize: '0.85rem', opacity: 0.85, textTransform: 'uppercase', fontWeight: 700 }}>Tổng phí toàn hợp đồng</span>
               <div style={{ fontSize: '2.8rem', fontWeight: 900, margin: '0.35rem 0' }}>
                 ${getTotalPremium().toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </div>
@@ -706,7 +706,7 @@ export const BuyInsurance = ({ user }) => {
             <div style={{ padding: '1rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)', marginBottom: '1.25rem', border: '1px solid var(--border)' }}>
               <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <Building2 size={16} />
-                <span>Phạm Vi {locations.length} Địa Điểm Bảo Hiểm Áp Dụng:</span>
+                <span>Các địa điểm được bảo hiểm ({locations.length}):</span>
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 {locations.map((loc, idx) => (
@@ -723,13 +723,13 @@ export const BuyInsurance = ({ user }) => {
               <table className="custom-table">
                 <thead>
                   <tr>
-                    <th>Gói Quyền Lợi</th>
-                    <th>Loại Gói</th>
-                    <th>Hạn Mức</th>
-                    <th>Miễn Trừ</th>
-                    <th>Thời Hạn</th>
-                    <th>Tỷ Lệ Phí</th>
-                    <th style={{ textAlign: 'right' }}>Phí / Địa Điểm ($USD)</th>
+                    <th>Gói quyền lợi</th>
+                    <th>Loại gói</th>
+                    <th>Hạn mức</th>
+                    <th>Miễn thường</th>
+                    <th>Thời hạn</th>
+                    <th>Tỷ lệ phí</th>
+                    <th style={{ textAlign: 'right' }}>Phí / địa điểm (USD)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -757,14 +757,14 @@ export const BuyInsurance = ({ user }) => {
                 </tbody>
                 <tfoot>
                   <tr style={{ backgroundColor: 'var(--primary-light)' }}>
-                    <td colSpan={6} style={{ fontWeight: 800, textAlign: 'right' }}>PHÍ BẢO HIỂM MỖI ĐỊA ĐIỂM:</td>
+                    <td colSpan={6} style={{ fontWeight: 800, textAlign: 'right' }}>Phí bảo hiểm mỗi địa điểm:</td>
                     <td style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '1rem', textAlign: 'right' }}>
                       ${getPerLocationPremium().toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </td>
                   </tr>
                   <tr style={{ backgroundColor: 'var(--primary)', color: 'white' }}>
                     <td colSpan={6} style={{ fontWeight: 900, textAlign: 'right', color: 'white' }}>
-                      TỔNG PHÍ HỢP ĐỒNG ({locations.length} ĐỊA ĐIỂM):
+                      Tổng phí hợp đồng ({locations.length} địa điểm):
                     </td>
                     <td style={{ fontWeight: 900, color: 'white', fontSize: '1.15rem', textAlign: 'right' }}>
                       ${getTotalPremium().toLocaleString('en-US', { minimumFractionDigits: 2 })}
@@ -776,7 +776,7 @@ export const BuyInsurance = ({ user }) => {
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', padding: '0.75rem 1rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
               <Info size={16} style={{ color: 'var(--secondary)', flexShrink: 0 }} />
-              <span>Phí được tính tự động theo công thức nghiệp vụ cho từng địa điểm rủi ro. Phí chính thức sẽ được phê duyệt tại bước báo phí.</span>
+              <span>Phí được tính tự động theo công thức cho từng địa điểm. Phí chính thức sẽ được duyệt ở bước báo giá.</span>
             </div>
 
             <div style={{ display: 'flex', gap: '1rem' }}>
@@ -784,7 +784,7 @@ export const BuyInsurance = ({ user }) => {
                 <ArrowLeft size={18} /><span>Điều chỉnh</span>
               </button>
               <button onClick={() => setStep(4)} className="btn btn-primary" style={{ flex: 2 }}>
-                <span>Xác Nhận Đơn Mua ({locations.length} Địa Điểm)</span>
+                <span>Xác nhận đơn mua ({locations.length} địa điểm)</span>
                 <ArrowRight size={18} />
               </button>
             </div>
@@ -796,15 +796,15 @@ export const BuyInsurance = ({ user }) => {
           <div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.25rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <FileText size={22} />
-              <span>Bước 4: Xác Nhận & Nộp Đơn Yêu Cầu Cấp Hợp Đồng</span>
+              <span>Bước 4: Xác nhận & gửi yêu cầu</span>
             </h3>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.75rem', padding: '1.5rem', backgroundColor: 'var(--bg-main)', borderRadius: 'var(--radius-md)' }}>
               <div>
-                <h4 style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', textTransform: 'uppercase', fontWeight: 700 }}>Bên Mua Bảo Hiểm</h4>
+                <h4 style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', textTransform: 'uppercase', fontWeight: 700 }}>Bên mua bảo hiểm</h4>
                 {[
-                  ['Tên Doanh nghiệp', insuredInfo.name],
-                  ['Gmail nhận Hợp đồng', insuredInfo.email],
+                  ['Tên doanh nghiệp', insuredInfo.name],
+                  ['Email nhận hợp đồng', insuredInfo.email],
                   ['Số điện thoại', insuredInfo.phone],
                   ['Ngày hiệu lực', new Date(effectiveDateStr).toLocaleDateString('vi-VN')],
                 ].map(([label, value]) => (
@@ -815,7 +815,7 @@ export const BuyInsurance = ({ user }) => {
               </div>
               <div>
                 <h4 style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', textTransform: 'uppercase', fontWeight: 700 }}>
-                  Địa Điểm & Quyền Lợi ({locations.length} Cơ Sở)
+                  Địa điểm & quyền lợi ({locations.length} địa điểm)
                 </h4>
                 <div style={{ maxHeight: 110, overflowY: 'auto', marginBottom: '0.5rem', paddingRight: '0.25rem' }}>
                   {locations.map((loc, idx) => (
@@ -825,7 +825,7 @@ export const BuyInsurance = ({ user }) => {
                   ))}
                 </div>
                 <p style={{ marginBottom: '0.35rem', fontSize: '0.875rem' }}>
-                  <strong>Quyền lợi bảo hiểm:</strong> {selectedCoverages.filter((c) => c.selected).length} gói / địa điểm
+                  <strong>Quyền lợi:</strong> {selectedCoverages.filter((c) => c.selected).length} gói / địa điểm
                 </p>
                 <p style={{ marginBottom: '0.5rem', fontSize: '0.875rem' }}>
                   <strong>Tổng phí ({locations.length} địa điểm): </strong>
@@ -848,7 +848,7 @@ export const BuyInsurance = ({ user }) => {
                 disabled={loading}
               >
                 <Bookmark size={18} style={{ color: 'var(--secondary)' }} />
-                <span>Lưu Trạng Thái Bản Nháp (DRAFT)</span>
+                <span>Lưu bản nháp</span>
               </button>
               <button
                 type="button"
@@ -858,9 +858,9 @@ export const BuyInsurance = ({ user }) => {
                 disabled={loading}
               >
                 {loading ? (
-                  <><RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} /><span>Đang xử lý đơn...</span></>
+                  <><RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} /><span>Đang xử lý...</span></>
                 ) : (
-                  <><CheckCircle size={18} /><span>Nộp Đơn & Xuất Báo Giá (QUOTED)</span></>
+                  <><CheckCircle size={18} /><span>Nộp đơn & xuất báo giá</span></>
                 )}
               </button>
             </div>

@@ -57,6 +57,9 @@ public class Policy {
     @Builder.Default
     private Integer version = 1;
 
+    /** Số HĐ gốc khi hợp đồng này được tạo bằng tái tục (nullable). */
+    private String renewedFromPolicyNumber;
+
     @Version
     private Long versionLock;
 

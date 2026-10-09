@@ -6,6 +6,8 @@ import Profile from './pages/Profile';
 import CustomerPortal from './pages/CustomerPortal';
 import BuyInsurance from './pages/BuyInsurance';
 import PolicyDetail from './pages/PolicyDetail';
+import ClaimList from './pages/ClaimList';
+import ClaimDetail from './pages/ClaimDetail';
 import AdminDashboard from './pages/AdminDashboard';
 import BenchmarkView from './pages/BenchmarkView';
 
@@ -56,6 +58,8 @@ function App() {
             <Route path="/my-policies" element={<ProtectedRoute element={<CustomerPortal user={user} isAdmin={isAdmin} />} />} />
             <Route path="/buy" element={<ProtectedRoute element={<BuyInsurance user={user} />} />} />
             <Route path="/policies/:policyNumber" element={<ProtectedRoute element={<PolicyDetail user={user} isAdmin={isAdmin} />} />} />
+            <Route path="/claims" element={<ProtectedRoute element={<ClaimList user={user} isAdmin={isAdmin} />} />} />
+            <Route path="/claims/:claimNumber" element={<ProtectedRoute element={<ClaimDetail user={user} isAdmin={isAdmin} />} />} />
 
             {/* Protected: Admin-only pages */}
             <Route path="/admin/reports" element={<ProtectedRoute element={<AdminDashboard />} requireAdmin />} />
